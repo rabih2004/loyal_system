@@ -1,0 +1,1175 @@
+/**
+ * LoyalSystem — Public Frontend Styles
+ * @package LoyalSystem
+ */
+
+/* =========================================================================
+   RESET / BASE
+   ========================================================================= */
+
+.ls-container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 24px 16px;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.ls-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+.ls-card-header {
+    margin-bottom: 20px;
+}
+
+.ls-page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 20px;
+}
+
+.ls-form-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 6px;
+    text-align: center;
+}
+
+.ls-form-subtitle {
+    font-size: 0.9rem;
+    color: #6b7280;
+    text-align: center;
+    margin: 0;
+}
+
+.ls-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 14px;
+}
+
+.ls-text-center { text-align: center; }
+.ls-text-muted  { color: #6b7280; }
+.ls-mt-1        { margin-top: 12px; }
+.ls-small       { font-size: 0.82rem; }
+.ls-error       { color: #991b1b; font-size: 0.9rem; }
+
+/* =========================================================================
+   BUTTONS
+   ========================================================================= */
+
+.ls-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border-radius: 7px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    border: 2px solid transparent;
+    transition: background .15s, color .15s, border-color .15s;
+    white-space: nowrap;
+    line-height: 1.4;
+}
+
+.ls-btn:disabled,
+.ls-btn[disabled] {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+.ls-btn-primary {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+.ls-btn-primary:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    color: #fff;
+    text-decoration: none;
+}
+
+.ls-btn-outline {
+    background: transparent;
+    color: #374151;
+    border-color: #d1d5db;
+}
+.ls-btn-outline:hover {
+    background: #f3f4f6;
+    color: #111827;
+    text-decoration: none;
+}
+
+.ls-btn-sm {
+    padding: 6px 14px;
+    font-size: 0.85rem;
+}
+
+/* Full-width block button */
+.ls-btn-block,
+.ls-btn-full {
+    display: flex;
+    width: 100%;
+}
+
+/* Link-style button */
+.ls-link-btn {
+    background: none;
+    border: none;
+    color: #2563eb;
+    cursor: pointer;
+    font-size: inherit;
+    font-weight: 600;
+    padding: 0;
+    text-decoration: underline;
+    line-height: inherit;
+}
+.ls-link-btn:hover { color: #1d4ed8; }
+
+/* Button spinner */
+.ls-btn-text { display: inline; }
+
+.ls-btn-spinner {
+    display: none;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: ls-spin .6s linear infinite;
+    flex-shrink: 0;
+}
+.ls-btn-outline .ls-btn-spinner {
+    border-color: rgba(0,0,0,.15);
+    border-top-color: #374151;
+}
+
+@keyframes ls-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* =========================================================================
+   FORMS
+   ========================================================================= */
+
+.ls-form-group {
+    margin-bottom: 16px;
+}
+
+.ls-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.ls-required {
+    color: #ef4444;
+    margin-left: 2px;
+}
+
+.ls-input,
+.ls-select,
+.ls-textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: #111827;
+    background: #fff;
+    box-sizing: border-box;
+    transition: border-color .15s;
+    font-family: inherit;
+}
+
+.ls-input:focus,
+.ls-select:focus,
+.ls-textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+}
+
+.ls-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Input hint below field */
+.ls-input-hint {
+    display: block;
+    font-size: 0.78rem;
+    color: #9ca3af;
+    margin-top: 4px;
+}
+
+/* Password field wrapper */
+.ls-input-wrap,
+.ls-password-wrap {
+    position: relative;
+}
+
+.ls-password-wrap .ls-input {
+    padding-right: 40px;
+}
+
+.ls-pw-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 2px;
+    line-height: 1;
+    font-size: 1.1rem;
+}
+.ls-pw-toggle:hover { color: #374151; }
+
+.ls-eye-icon { pointer-events: none; }
+
+/* Divider */
+.ls-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #9ca3af;
+    font-size: 0.8rem;
+    margin: 16px 0;
+}
+.ls-divider::before,
+.ls-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e5e7eb;
+}
+
+/* =========================================================================
+   MESSAGES
+   ========================================================================= */
+
+.ls-message {
+    display: none;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    margin-bottom: 14px;
+}
+
+.ls-message--success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+.ls-message--error   { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+.ls-message--info    { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+.ls-message--warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+
+/* =========================================================================
+   BADGES / STATUS
+   ========================================================================= */
+
+.ls-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.ls-status-open        { background: #dbeafe; color: #1e40af; }
+.ls-status-in_progress { background: #fef3c7; color: #92400e; }
+.ls-status-resolved    { background: #dcfce7; color: #166534; }
+.ls-status-closed      { background: #f3f4f6; color: #6b7280; }
+.ls-type-credit        { background: #dcfce7; color: #166534; }
+.ls-type-debit         { background: #fee2e2; color: #991b1b; }
+
+/* =========================================================================
+   LOGIN APP
+   ========================================================================= */
+
+.ls-login-container {
+    max-width: 440px;
+    margin: 40px auto;
+    padding: 0 16px;
+}
+
+.ls-login-container .ls-card {
+    padding: 36px 32px;
+}
+
+.ls-step              { display: none; }
+.ls-step.ls-active    { display: block; }
+
+/* Logged-in notice on login page */
+.ls-logged-in-notice {
+    padding: 16px 0;
+}
+
+.ls-check-icon {
+    font-size: 3rem;
+    color: #166534;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.ls-welcome-text {
+    color: #374151;
+    margin: 0 0 16px;
+}
+
+/* Phone input */
+.ls-phone-input {
+    letter-spacing: 0.04em;
+}
+
+/* OTP digit inputs */
+.ls-otp-inputs {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin: 16px 0;
+}
+
+.ls-otp-digit {
+    width: 46px;
+    height: 52px;
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    color: #111827;
+    background: #fff;
+    transition: border-color .15s;
+    box-sizing: border-box;
+    padding: 0;
+}
+
+.ls-otp-digit:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+}
+
+.ls-otp-digit.ls-otp-error {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+
+/* Resend / countdown */
+.ls-otp-resend {
+    margin-top: 12px;
+    font-size: 0.88rem;
+    color: #6b7280;
+    min-height: 24px;
+}
+
+.ls-countdown {
+    font-weight: 600;
+    color: #374151;
+}
+
+/* =========================================================================
+   PORTAL PAGES — hide WordPress page title
+   ========================================================================= */
+
+/* The_title filter removes the text but theme may still render an empty <h1>.
+   Hide it via CSS as a safety net for themes that wrap in a heading element. */
+.ls-portal-page .entry-title:empty,
+.ls-portal-page .page-title:empty,
+.ls-portal-page h1.entry-title { display: none !important; }
+
+/* =========================================================================
+   DASHBOARD
+   ========================================================================= */
+
+.ls-dashboard-container {}
+
+/* Header row */
+.ls-dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.ls-dash-greeting-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.ls-dash-greeting-hi {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.ls-dash-greeting-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+/* Compact balance bar */
+.ls-dash-top-row {
+    margin-bottom: 14px;
+}
+
+.ls-dash-balance-compact {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: #fff;
+    border-radius: 10px;
+    padding: 10px 20px;
+}
+
+.ls-dash-balance-label {
+    font-size: 0.8rem;
+    opacity: .8;
+    font-weight: 500;
+}
+
+.ls-dash-balance-amount {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+
+/* One-row action buttons */
+.ls-dash-btn-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-bottom: 20px;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.ls-dash-btn-row::-webkit-scrollbar { display: none; }
+
+.ls-dash-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 12px 10px;
+    min-width: 76px;
+    flex-shrink: 0;
+    background: #fff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #374151;
+    text-align: center;
+    transition: border-color .15s, box-shadow .15s, background .15s;
+    cursor: pointer;
+}
+
+.ls-dash-btn:hover {
+    border-color: #2563eb;
+    box-shadow: 0 2px 8px rgba(37,99,235,.12);
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.ls-dash-btn-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.ls-dash-btn-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+/* Ledger card */
+.ls-ledger-card {}
+
+/* =========================================================================
+   TABLES
+   ========================================================================= */
+
+.ls-table-wrap { overflow-x: auto; }
+
+.ls-table,
+.ls-ledger-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.ls-table th,
+.ls-ledger-table th {
+    background: #f9fafb;
+    color: #374151;
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+}
+
+.ls-table td,
+.ls-ledger-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #374151;
+    vertical-align: top;
+}
+
+.ls-table tr:last-child td,
+.ls-ledger-table tr:last-child td {
+    border-bottom: none;
+}
+
+.ls-amount-credit { color: #166534; font-weight: 600; }
+.ls-amount-debit  { color: #991b1b; font-weight: 600; }
+
+.ls-ledger-file-btn {
+    font-size: 1.1em;
+    text-decoration: none;
+    line-height: 1;
+    opacity: 0.75;
+    transition: opacity .15s;
+}
+.ls-ledger-file-btn:hover { opacity: 1; }
+
+/* =========================================================================
+   SUBMIT TICKET FORM
+   ========================================================================= */
+
+.ls-submit-ticket-container {}
+
+.ls-form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+@media (max-width: 480px) {
+    .ls-form-grid-2 { grid-template-columns: 1fr; }
+}
+
+.ls-ticket-topbar {
+    margin-bottom: 16px;
+}
+
+.ls-ticket-success-wrap {
+    text-align: center;
+    padding: 48px 24px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    margin-bottom: 24px;
+}
+
+.ls-ticket-success-icon {
+    width: 72px;
+    height: 72px;
+    line-height: 72px;
+    border-radius: 50%;
+    background: #27ae60;
+    color: #fff;
+    font-size: 36px;
+    margin: 0 auto 20px;
+}
+
+.ls-ticket-success-title {
+    font-size: 1.6em;
+    font-weight: 700;
+    color: #27ae60;
+    margin: 0 0 12px;
+}
+
+.ls-ticket-success-msg {
+    font-size: 1.1em;
+    color: #555;
+    margin: 0 0 28px;
+}
+
+/* =========================================================================
+   FEEDBACK FORMS
+   ========================================================================= */
+
+.ls-feedback-container {}
+
+.ls-feedback-topbar { margin-bottom: 16px; }
+
+/* Feedback header banner */
+.ls-fb-header {
+    text-align: center;
+    padding: 28px 16px 20px;
+    margin-bottom: 16px;
+}
+
+.ls-fb-header-icon {
+    font-size: 2.8rem;
+    line-height: 1;
+    margin-bottom: 10px;
+}
+
+.ls-fb-header-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 6px;
+}
+
+.ls-fb-header-sub {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* Contact card */
+.ls-fb-contact-card { margin-bottom: 12px; }
+
+.ls-fb-contact-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.ls-fb-contact-row .ls-form-group { flex: 1; min-width: 200px; margin-bottom: 0; }
+
+/* Section labels inside cards */
+.ls-fb-section-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #9ca3af;
+    margin: 0 0 16px;
+}
+
+/* Questions card */
+.ls-fb-questions-card { margin-bottom: 16px; }
+
+/* Individual question row */
+.ls-fb-question-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid #f3f4f6;
+    flex-wrap: wrap;
+}
+
+.ls-fb-question-card:last-child { border-bottom: none; }
+
+.ls-fb-question-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.ls-fb-qnum {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: #f3f4f6;
+    color: #6b7280;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.ls-fb-question-text {
+    margin: 0;
+    font-size: 0.92rem;
+    color: #111827;
+    line-height: 1.5;
+}
+
+/* Pill toggle group */
+.ls-fb-choices {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* Hide the actual radio input */
+.ls-fb-radio { display: none; }
+
+/* Pill button base */
+.ls-fb-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 22px;
+    border-radius: 30px;
+    border: 2px solid #d1d5db;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s, box-shadow .15s;
+    user-select: none;
+    letter-spacing: 0.04em;
+    background: #f9fafb;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+.ls-fb-pill--oui { color: #166534; border-color: #86efac; background: #f0fdf4; }
+.ls-fb-pill--non { color: #991b1b; border-color: #fca5a5; background: #fef2f2; }
+
+.ls-fb-pill--oui:hover { background: #dcfce7; border-color: #4ade80; }
+.ls-fb-pill--non:hover { background: #fee2e2; border-color: #f87171; }
+
+/* Selected state via :checked + adjacent label */
+.ls-fb-radio:checked + .ls-fb-pill--oui {
+    background: #16a34a;
+    color: #fff;
+    border-color: #16a34a;
+    box-shadow: 0 2px 8px rgba(22,163,74,.25);
+}
+
+.ls-fb-radio:checked + .ls-fb-pill--non {
+    background: #dc2626;
+    color: #fff;
+    border-color: #dc2626;
+    box-shadow: 0 2px 8px rgba(220,38,38,.25);
+}
+
+/* Inline number/text inputs in questions */
+.ls-fb-number-input {
+    width: 90px !important;
+    text-align: center;
+}
+
+.ls-fb-text-input {
+    width: 160px !important;
+}
+
+/* Merchant stars decoration */
+.ls-merchant-stars {
+    text-align: center;
+    font-size: 2rem;
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+    line-height: 1;
+}
+
+/* Slider questions */
+.ls-fb-question-card--slider {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.ls-fb-slider-wrap {
+    width: 100%;
+    padding: 0 4px;
+}
+
+.ls-fb-slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: #9ca3af;
+    margin-bottom: 4px;
+}
+
+.ls-fb-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 4px;
+    background: linear-gradient(to right, #b45309 0%, #d97706 50%, #fbbf24 100%);
+    outline: none;
+    cursor: pointer;
+}
+
+.ls-fb-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #d97706;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,.25);
+    cursor: pointer;
+}
+
+.ls-fb-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #d97706;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,.25);
+    cursor: pointer;
+}
+
+.ls-fb-slider-val {
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #92400e;
+    margin-top: 6px;
+}
+
+/* =========================================================================
+   MY FEEDBACK
+   ========================================================================= */
+
+.ls-my-feedback-container {}
+
+/* Top bar */
+.ls-myfb-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.ls-myfb-topbar-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Empty state */
+.ls-myfb-empty {
+    text-align: center;
+    padding: 48px 24px;
+}
+
+.ls-myfb-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+}
+
+.ls-myfb-empty-text {
+    color: #6b7280;
+    margin: 0 0 20px;
+    font-size: 1rem;
+}
+
+.ls-myfb-empty-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Feedback item card */
+.ls-myfb-list { display: flex; flex-direction: column; gap: 12px; }
+
+.ls-myfb-item { padding: 18px 20px; }
+
+.ls-myfb-item-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.ls-myfb-item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    flex-wrap: wrap;
+}
+
+/* Type badge */
+.ls-myfb-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.ls-myfb-type--maintenance {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.ls-myfb-type--delivery {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.ls-myfb-date {
+    font-size: 0.82rem;
+}
+
+/* Score pill */
+.ls-myfb-score {
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.ls-myfb-score--good { background: #dcfce7; color: #166534; }
+.ls-myfb-score--mid  { background: #fef3c7; color: #92400e; }
+.ls-myfb-score--low  { background: #fee2e2; color: #991b1b; }
+
+/* Toggle button */
+.ls-myfb-toggle {
+    margin-left: auto;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ls-myfb-chevron {
+    display: inline-block;
+    transition: transform .2s;
+    font-size: 1.1em;
+    line-height: 1;
+}
+
+/* Answers panel */
+.ls-myfb-answers {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.ls-myfb-answer-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ls-myfb-answer-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.875rem;
+    padding: 6px 0;
+    border-bottom: 1px solid #f9fafb;
+}
+
+.ls-myfb-answer-row:last-child { border-bottom: none; }
+
+.ls-myfb-ans-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    color: #9ca3af;
+    font-size: 0.72rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.ls-myfb-ans-label {
+    flex: 1;
+    color: #374151;
+    text-transform: capitalize;
+}
+
+.ls-myfb-ans-val {
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.ls-myfb-ans--oui { background: #dcfce7; color: #166534; }
+.ls-myfb-ans--non { background: #fee2e2; color: #991b1b; }
+
+/* =========================================================================
+   MY TICKETS
+   ========================================================================= */
+
+.ls-my-tickets-container {}
+
+.ls-ticket-list { display: flex; flex-direction: column; gap: 12px; }
+
+.ls-ticket-item {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ls-ticket-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ls-ticket-id {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #6b7280;
+}
+
+.ls-ticket-subject {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.ls-ticket-meta {
+    font-size: 0.82rem;
+    margin: 0;
+}
+
+/* =========================================================================
+   TICKET DETAIL
+   ========================================================================= */
+
+.ls-ticket-detail-container {}
+
+.ls-ticket-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.ls-detail-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ls-detail-table th,
+.ls-detail-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f3f4f6;
+    text-align: left;
+    vertical-align: top;
+}
+
+.ls-detail-table th {
+    width: 130px;
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 0.875rem;
+    white-space: nowrap;
+}
+
+.ls-detail-table td { color: #111827; }
+
+.ls-ticket-description,
+.ls-admin-notes {
+    line-height: 1.65;
+    color: #374151;
+    font-size: 0.95rem;
+}
+
+.ls-admin-reply {
+    border-left: 4px solid #2563eb;
+}
+
+/* =========================================================================
+   IMAGE GALLERY
+   ========================================================================= */
+
+.ls-image-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.ls-image-thumb-link {
+    display: block;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 2px solid #e5e7eb;
+    transition: border-color .15s;
+}
+.ls-image-thumb-link:hover { border-color: #2563eb; }
+
+.ls-image-thumb {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    display: block;
+}
+
+/* =========================================================================
+   INVOICE LOOKUP
+   ========================================================================= */
+
+.ls-invoice-lookup-container {}
+
+/* =========================================================================
+   LOGIN REQUIRED
+   ========================================================================= */
+
+.ls-login-required-container {
+    max-width: 440px;
+    padding-top: 60px;
+}
+
+.ls-lock-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    display: block;
+}
+
+/* =========================================================================
+   RESPONSIVE
+   ========================================================================= */
+
+@media ( max-width: 600px ) {
+    .ls-login-container .ls-card { padding: 24px 18px; }
+
+    .ls-otp-digit {
+        width: 40px;
+        height: 46px;
+        font-size: 1.2rem;
+    }
+
+    .ls-dashboard-actions .ls-action-card { min-width: 100%; }
+
+    .ls-balance-amount { font-size: 1.6rem; }
+
+    .ls-detail-table th { width: 90px; }
+}

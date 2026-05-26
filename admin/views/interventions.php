@@ -54,12 +54,12 @@ $base_url = admin_url( 'admin.php?page=ls-interventions' );
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="ls-int-pickup"><?php esc_html_e( 'Chauffeur (Pickup)', 'loyal-system' ); ?></label></th>
+                        <th><label for="ls-int-pickup"><?php esc_html_e( 'Responsable', 'loyal-system' ); ?></label></th>
                         <td>
                             <select name="pickup_id" id="ls-int-pickup" class="regular-text">
                                 <option value="0"><?php esc_html_e( '— Aucun —', 'loyal-system' ); ?></option>
                                 <?php foreach ( $pickups as $pk ) : ?>
-                                    <option value="<?php echo (int) $pk->id; ?>"><?php echo esc_html( $pk->name . ( $pk->plate_number ? ' (' . $pk->plate_number . ')' : '' ) ); ?></option>
+                                    <option value="<?php echo (int) $pk->id; ?>"><?php echo esc_html( ( $pk->category ? $pk->category . ' - ' : '' ) . $pk->name ); ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </td>
@@ -119,11 +119,11 @@ $base_url = admin_url( 'admin.php?page=ls-interventions' );
             </select>
         </div>
         <div>
-            <label style="display:block;font-size:12px;font-weight:600;margin-bottom:2px;"><?php esc_html_e( 'Chauffeur', 'loyal-system' ); ?></label>
-            <select name="pickup_id" class="regular-text" style="min-width:140px;">
+            <label style="display:block;font-size:12px;font-weight:600;margin-bottom:2px;"><?php esc_html_e( 'Responsable', 'loyal-system' ); ?></label>
+            <select name="pickup_id" class="regular-text" style="min-width:160px;">
                 <option value="0"><?php esc_html_e( 'Tous', 'loyal-system' ); ?></option>
                 <?php foreach ( $pickups as $pk ) : ?>
-                    <option value="<?php echo (int) $pk->id; ?>" <?php selected( $pickup_filter, $pk->id ); ?>><?php echo esc_html( $pk->name ); ?></option>
+                    <option value="<?php echo (int) $pk->id; ?>" <?php selected( $pickup_filter, $pk->id ); ?>><?php echo esc_html( ( $pk->category ? $pk->category . ' - ' : '' ) . $pk->name ); ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -157,7 +157,7 @@ $base_url = admin_url( 'admin.php?page=ls-interventions' );
                 <th style="width:40px;">#</th>
                 <th><?php esc_html_e( 'Client', 'loyal-system' ); ?></th>
                 <th><?php esc_html_e( 'Type', 'loyal-system' ); ?></th>
-                <th><?php esc_html_e( 'Chauffeur', 'loyal-system' ); ?></th>
+                <th><?php esc_html_e( 'Responsable', 'loyal-system' ); ?></th>
                 <th><?php esc_html_e( 'Date prévue', 'loyal-system' ); ?></th>
                 <th><?php esc_html_e( 'Dépôt', 'loyal-system' ); ?></th>
                 <th><?php esc_html_e( 'Statut', 'loyal-system' ); ?></th>
@@ -188,6 +188,9 @@ $base_url = admin_url( 'admin.php?page=ls-interventions' );
                 <td><span class="ls-badge ls-type-<?php echo esc_attr( $iv->type ); ?>"><?php echo esc_html( $type_lbl ); ?></span></td>
                 <td>
                     <?php if ( $iv->pickup_name ) : ?>
+                        <?php if ( $iv->pickup_category ) : ?>
+                            <small style="color:#666;"><?php echo esc_html( $iv->pickup_category ); ?></small><br>
+                        <?php endif; ?>
                         <?php echo esc_html( $iv->pickup_name ); ?><br>
                         <small><?php echo esc_html( $iv->pickup_plate ?: '' ); ?></small>
                     <?php else : ?>
@@ -216,6 +219,7 @@ $base_url = admin_url( 'admin.php?page=ls-interventions' );
                     <button type="button" class="button button-small ls-iv-edit-btn"
                         data-id="<?php echo $iv_id; ?>"
                         data-status="<?php echo esc_attr( $iv->status ); ?>"
+                        data-pickup-id="<?php echo (int) $iv->pickup_id; ?>"
                         data-notes="<?php echo esc_attr( $iv->notes ); ?>">
                         <?php esc_html_e( 'Modifier', 'loyal-system' ); ?>
                     </button>
@@ -229,6 +233,7 @@ $base_url = admin_url( 'admin.php?page=ls-interventions' );
                         data-cust-name="<?php echo esc_attr( $cust_name ); ?>"
                         data-cust-phone="<?php echo esc_attr( $iv->customer_phone ?: '' ); ?>"
                         data-cust-address="<?php echo esc_attr( $iv->customer_address ?: '' ); ?>"
+                        data-pickup-category="<?php echo esc_attr( $iv->pickup_category ?: '' ); ?>"
                         data-pickup-name="<?php echo esc_attr( $iv->pickup_name ?: '' ); ?>"
                         data-pickup-plate="<?php echo esc_attr( $iv->pickup_plate ?: '' ); ?>"
                         data-pickup-phone="<?php echo esc_attr( $iv->pickup_phone ?: '' ); ?>"
@@ -250,6 +255,17 @@ $base_url = admin_url( 'admin.php?page=ls-interventions' );
                             <select name="status" class="regular-text">
                                 <?php foreach ( $statuses as $val => $label ) : ?>
                                     <option value="<?php echo esc_attr( $val ); ?>" <?php selected( $iv->status, $val ); ?>><?php echo esc_html( $label ); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display:block;font-weight:600;font-size:12px;margin-bottom:3px;"><?php esc_html_e( 'Responsable', 'loyal-system' ); ?></label>
+                            <select name="pickup_id" style="min-width:180px;">
+                                <option value="0"><?php esc_html_e( '— Aucun —', 'loyal-system' ); ?></option>
+                                <?php foreach ( $pickups as $pk ) : ?>
+                                    <option value="<?php echo (int) $pk->id; ?>" <?php selected( (int) $iv->pickup_id, (int) $pk->id ); ?>>
+                                        <?php echo esc_html( ( $pk->category ? $pk->category . ' - ' : '' ) . $pk->name ); ?>
+                                    </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -455,7 +471,7 @@ $base_url = admin_url( 'admin.php?page=ls-interventions' );
             + '<div class="iv-row"><span class="iv-row-label">Adresse</span><span class="iv-row-val">' + (d.custAddress||'—') + '</span></div>'
             + '</div>'
 
-            + '<div class="iv-section"><div class="iv-section-title">&#128666; Chauffeur</div>'
+            + '<div class="iv-section"><div class="iv-section-title">&#128666; ' + (d.pickupCategory || 'Responsable') + '</div>'
             + '<div class="iv-row"><span class="iv-row-label">Nom</span><span class="iv-row-val">' + (d.pickupName||'—') + '</span></div>'
             + '<div class="iv-row"><span class="iv-row-label">Téléphone</span><span class="iv-row-val">' + (d.pickupPhone||'—') + '</span></div>'
             + '<div class="iv-row"><span class="iv-row-label">Plaque</span><span class="iv-row-val">' + (d.pickupPlate||'—') + '</span></div>'

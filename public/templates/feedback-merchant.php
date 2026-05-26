@@ -1,4 +1,10 @@
-<?php if ( ! defined( 'ABSPATH' ) ) exit; ?>
+<?php if ( ! defined( 'ABSPATH' ) ) exit;
+
+$dashboard_url = $dashboard_url ?? '';
+$is_logged_in  = $is_logged_in  ?? false;
+$customer      = $customer      ?? null;
+$branches      = $branches      ?? array();
+?>
 <div class="ls-container ls-feedback-container">
 
     <?php if ( $dashboard_url ) : ?>
@@ -23,12 +29,7 @@
         <div class="ls-fb-header">
             <div class="ls-fb-header-icon">&#127978;</div>
             <h2 class="ls-fb-header-title"><?php esc_html_e( 'Votre Avis', 'loyal-system' ); ?></h2>
-            <p class="ls-fb-header-sub"><?php esc_html_e( 'Évaluez votre expérience en magasin.', 'loyal-system' ); ?></p>
-        </div>
-
-        <!-- Stars display (decorative) -->
-        <div class="ls-merchant-stars" aria-hidden="true">
-            <span>&#11088;</span><span>&#11088;</span><span>&#11088;</span><span>&#11088;</span><span>&#11088;</span>
+            <p class="ls-fb-header-sub">Merci de votre visite dans notre magasin.<br>Votre avis est important pour nous afin d'améliorer votre expérience.</p>
         </div>
 
         <div id="ls-feedback-msg" class="ls-message" role="alert" style="display:none;"></div>
@@ -70,85 +71,106 @@
             </div>
 
             <!-- Questions -->
+            <?php
+            if ( ! function_exists( 'ls_fb_pill_choices' ) ) :
+            function ls_fb_pill_choices( string $name, array $options ) {
+                foreach ( $options as $value => $color_class ) :
+                    $id = esc_attr( $name . '_' . preg_replace( '/[^a-z0-9]/', '_', strtolower( $value ) ) );
+                    ?>
+                    <input type="radio" id="<?php echo $id; ?>" name="<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( $value ); ?>" class="ls-fb-radio">
+                    <label for="<?php echo $id; ?>" class="ls-fb-pill <?php echo esc_attr( $color_class ); ?>"><?php echo esc_html( $value ); ?></label>
+                    <?php
+                endforeach;
+            }
+            endif;
+            ?>
             <div class="ls-card ls-fb-questions-card">
                 <h3 class="ls-fb-section-label"><?php esc_html_e( 'Évaluation', 'loyal-system' ); ?></h3>
 
-                <!-- Q1: Personnel accueillant -->
-                <div class="ls-fb-question-card">
+                <!-- Q1: Satisfaction visite -->
+                <div class="ls-fb-question-card ls-fb-question-card--wrap">
                     <div class="ls-fb-question-body">
                         <span class="ls-fb-qnum">1</span>
-                        <p class="ls-fb-question-text">Personnel accueillant</p>
+                        <p class="ls-fb-question-text"><?php esc_html_e( 'Êtes-vous satisfait de votre visite en magasin ?', 'loyal-system' ); ?></p>
                     </div>
-                    <div class="ls-fb-choices">
-                        <input type="radio" id="q_welcoming_oui" name="q_welcoming" value="OUI" class="ls-fb-radio">
-                        <label for="q_welcoming_oui" class="ls-fb-pill ls-fb-pill--oui">Oui</label>
-                        <input type="radio" id="q_welcoming_non" name="q_welcoming" value="NON" class="ls-fb-radio">
-                        <label for="q_welcoming_non" class="ls-fb-pill ls-fb-pill--non">Non</label>
+                    <div class="ls-fb-choices ls-fb-choices--wrap">
+                        <?php ls_fb_pill_choices( 'q_visit_satisfied', array(
+                            'Très satisfait' => 'ls-fb-pill--green',
+                            'Satisfait'      => 'ls-fb-pill--lightgreen',
+                            'Peu satisfait'  => 'ls-fb-pill--orange',
+                            'Pas satisfait'  => 'ls-fb-pill--red',
+                        ) ); ?>
                     </div>
                 </div>
 
-                <!-- Q2: Service rapide -->
-                <div class="ls-fb-question-card">
+                <!-- Q2: Accueil équipe -->
+                <div class="ls-fb-question-card ls-fb-question-card--wrap">
                     <div class="ls-fb-question-body">
                         <span class="ls-fb-qnum">2</span>
-                        <p class="ls-fb-question-text">Service rapide</p>
+                        <p class="ls-fb-question-text"><?php esc_html_e( "Comment évaluez-vous l'accueil de notre équipe ?", 'loyal-system' ); ?></p>
                     </div>
-                    <div class="ls-fb-choices">
-                        <input type="radio" id="q_fast_oui" name="q_fast" value="OUI" class="ls-fb-radio">
-                        <label for="q_fast_oui" class="ls-fb-pill ls-fb-pill--oui">Oui</label>
-                        <input type="radio" id="q_fast_non" name="q_fast" value="NON" class="ls-fb-radio">
-                        <label for="q_fast_non" class="ls-fb-pill ls-fb-pill--non">Non</label>
-                    </div>
-                </div>
-
-                <!-- Q3: Qualité produit (slider) -->
-                <div class="ls-fb-question-card ls-fb-question-card--slider">
-                    <div class="ls-fb-question-body">
-                        <span class="ls-fb-qnum">3</span>
-                        <p class="ls-fb-question-text">Qualité produit</p>
-                    </div>
-                    <div class="ls-fb-slider-wrap">
-                        <div class="ls-fb-slider-labels">
-                            <span>Faible</span><span>Excellent</span>
-                        </div>
-                        <input type="range" name="q_quality" min="1" max="10" value="5" class="ls-fb-slider" id="q_quality">
-                        <div class="ls-fb-slider-val" id="q_quality_val">5 / 10</div>
+                    <div class="ls-fb-choices ls-fb-choices--wrap">
+                        <?php ls_fb_pill_choices( 'q_team_welcome', array(
+                            'Excellent' => 'ls-fb-pill--green',
+                            'Bon'       => 'ls-fb-pill--lightgreen',
+                            'Moyen'     => 'ls-fb-pill--orange',
+                            'Mauvais'   => 'ls-fb-pill--red',
+                        ) ); ?>
                     </div>
                 </div>
 
-                <!-- Q4: Rapport qualité / prix (slider) -->
-                <div class="ls-fb-question-card ls-fb-question-card--slider">
-                    <div class="ls-fb-question-body">
-                        <span class="ls-fb-qnum">4</span>
-                        <p class="ls-fb-question-text">Rapport qualité / prix</p>
-                    </div>
-                    <div class="ls-fb-slider-wrap">
-                        <div class="ls-fb-slider-labels">
-                            <span>Bas</span><span>Élevé</span>
-                        </div>
-                        <input type="range" name="q_value" min="1" max="10" value="5" class="ls-fb-slider" id="q_value">
-                        <div class="ls-fb-slider-val" id="q_value_val">5 / 10</div>
-                    </div>
-                </div>
-
-                <!-- Q5: Recommanderiez-vous ? -->
+                <!-- Q3: Produits facilement trouvés -->
                 <div class="ls-fb-question-card">
                     <div class="ls-fb-question-body">
-                        <span class="ls-fb-qnum">5</span>
-                        <p class="ls-fb-question-text">Recommanderiez-vous notre enseigne ?</p>
+                        <span class="ls-fb-qnum">3</span>
+                        <p class="ls-fb-question-text"><?php esc_html_e( 'Avez-vous trouvé facilement les produits recherchés ?', 'loyal-system' ); ?></p>
                     </div>
                     <div class="ls-fb-choices">
-                        <input type="radio" id="q_recommend_oui" name="q_recommend" value="OUI" class="ls-fb-radio">
-                        <label for="q_recommend_oui" class="ls-fb-pill ls-fb-pill--oui">Oui</label>
-                        <input type="radio" id="q_recommend_non" name="q_recommend" value="NON" class="ls-fb-radio">
-                        <label for="q_recommend_non" class="ls-fb-pill ls-fb-pill--non">Non</label>
+                        <input type="radio" id="q_found_products_oui" name="q_found_products" value="OUI" class="ls-fb-radio">
+                        <label for="q_found_products_oui" class="ls-fb-pill ls-fb-pill--oui">OUI</label>
+                        <input type="radio" id="q_found_products_non" name="q_found_products" value="NON" class="ls-fb-radio">
+                        <label for="q_found_products_non" class="ls-fb-pill ls-fb-pill--non">NON</label>
                     </div>
                 </div>
 
-                <!-- Comment -->
-                <div class="ls-form-group" style="margin-top:16px;">
+                <!-- Q4: Qualité produits et services -->
+                <div class="ls-fb-question-card ls-fb-question-card--wrap">
+                    <div class="ls-fb-question-body">
+                        <span class="ls-fb-qnum">4</span>
+                        <p class="ls-fb-question-text"><?php esc_html_e( 'Comment jugez-vous la qualité de nos produits et services ?', 'loyal-system' ); ?></p>
+                    </div>
+                    <div class="ls-fb-choices ls-fb-choices--wrap">
+                        <?php ls_fb_pill_choices( 'q_product_quality', array(
+                            'Excellent' => 'ls-fb-pill--green',
+                            'Bon'       => 'ls-fb-pill--lightgreen',
+                            'Moyen'     => 'ls-fb-pill--orange',
+                            'Mauvais'   => 'ls-fb-pill--red',
+                        ) ); ?>
+                    </div>
+                </div>
+
+                <!-- Q5: Recommandation -->
+                <div class="ls-fb-question-card ls-fb-question-card--wrap">
+                    <div class="ls-fb-question-body">
+                        <span class="ls-fb-qnum">5</span>
+                        <p class="ls-fb-question-text"><?php esc_html_e( 'Recommanderez-vous notre magasin à votre entourage ?', 'loyal-system' ); ?></p>
+                    </div>
+                    <div class="ls-fb-choices ls-fb-choices--wrap">
+                        <?php ls_fb_pill_choices( 'q_recommend', array(
+                            'Oui'       => 'ls-fb-pill--green',
+                            'Peut-être' => 'ls-fb-pill--orange',
+                            'Non'       => 'ls-fb-pill--red',
+                        ) ); ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Commentaires -->
+            <div class="ls-card ls-fb-comment-card">
+                <div class="ls-form-group" style="margin:0;">
+                    <label class="ls-label"><?php esc_html_e( 'Commentaires ou suggestions (facultatif)', 'loyal-system' ); ?></label>
                     <textarea name="comment" class="ls-input" rows="3"
-                        placeholder="Commentaire (optionnel)"></textarea>
+                        placeholder="<?php esc_attr_e( 'Partagez vos remarques ou suggestions...', 'loyal-system' ); ?>"></textarea>
                 </div>
             </div>
 
@@ -162,11 +184,6 @@
 
 <script>
 (function($){
-    // Live slider value display
-    $('#q_quality, #q_value').on('input', function(){
-        $('#' + this.id + '_val').text(this.value + ' / 10');
-    });
-
     $('#ls-merchant-feedback-form').on('submit', function(e){
         e.preventDefault();
         var $btn = $('#ls-merchant-feedback-btn');

@@ -77,7 +77,7 @@ $type_icons = array(
 
                     <?php if ( ! empty( $iv->pickup_name ) ) : ?>
                     <div class="ls-iv-detail-item">
-                        <span class="ls-iv-detail-label"><?php esc_html_e( 'Chauffeur', 'loyal-system' ); ?></span>
+                        <span class="ls-iv-detail-label"><?php echo esc_html( $iv->pickup_category ?: __( 'Responsable', 'loyal-system' ) ); ?></span>
                         <span class="ls-iv-detail-value">
                             <?php echo esc_html( $iv->pickup_name ); ?>
                             <?php if ( ! empty( $iv->pickup_plate ) ) : ?>
@@ -89,7 +89,7 @@ $type_icons = array(
 
                     <?php if ( ! empty( $iv->pickup_phone ) ) : ?>
                     <div class="ls-iv-detail-item">
-                        <span class="ls-iv-detail-label"><?php esc_html_e( 'Téléphone chauffeur', 'loyal-system' ); ?></span>
+                        <span class="ls-iv-detail-label"><?php echo esc_html( sprintf( __( 'Téléphone %s', 'loyal-system' ), $iv->pickup_category ?: __( 'responsable', 'loyal-system' ) ) ); ?></span>
                         <span class="ls-iv-detail-value">
                             <a href="tel:<?php echo esc_attr( $iv->pickup_phone ); ?>" class="ls-iv-phone-link">
                                 <?php echo esc_html( $iv->pickup_phone ); ?>

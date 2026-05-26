@@ -176,10 +176,12 @@ class LS_Shortcodes {
             ? get_permalink( LS_Settings::feedback_maintenance_page_id() ) : '#';
         $delivery_url    = LS_Settings::feedback_delivery_page_id()
             ? get_permalink( LS_Settings::feedback_delivery_page_id() ) : '#';
+        $montage_url     = LS_Settings::form_montage_page_id()
+            ? get_permalink( LS_Settings::form_montage_page_id() ) : '#';
         $dashboard_url   = LS_Settings::dashboard_page_id()
             ? get_permalink( LS_Settings::dashboard_page_id() ) : '';
 
-        return self::render_template( 'my-feedback', compact( 'feedback', 'maintenance_url', 'delivery_url', 'dashboard_url' ), $content );
+        return self::render_template( 'my-feedback', compact( 'feedback', 'maintenance_url', 'delivery_url', 'montage_url', 'dashboard_url' ), $content );
     }
 
     public static function render_feedback_maintenance( $atts, $content = null ) {

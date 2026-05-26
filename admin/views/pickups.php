@@ -1,18 +1,29 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit; ?>
 <div class="wrap ls-admin-wrap">
-    <h1 class="wp-heading-inline"><?php esc_html_e( 'Pickups (Chauffeurs)', 'loyal-system' ); ?></h1>
+    <h1 class="wp-heading-inline"><?php esc_html_e( 'Pickups (Responsables)', 'loyal-system' ); ?></h1>
     <hr class="wp-header-end">
 
     <div id="ls-pickups-msg" style="display:none;" class="notice"></div>
 
     <!-- Add Pickup -->
     <div class="postbox" style="max-width:700px;">
-        <div class="postbox-header"><h2><?php esc_html_e( 'Ajouter un chauffeur', 'loyal-system' ); ?></h2></div>
+        <div class="postbox-header"><h2><?php esc_html_e( 'Ajouter un responsable', 'loyal-system' ); ?></h2></div>
         <div class="inside">
             <form id="ls-add-pickup-form" novalidate>
                 <table class="form-table" role="presentation">
                     <tr>
-                        <th><label for="ls-pickup-name"><?php esc_html_e( 'Nom du chauffeur', 'loyal-system' ); ?> *</label></th>
+                        <th><label for="ls-pickup-category"><?php esc_html_e( 'Catégorie', 'loyal-system' ); ?> *</label></th>
+                        <td>
+                            <select id="ls-pickup-category" name="category" class="regular-text" required>
+                                <option value=""><?php esc_html_e( '— Choisir —', 'loyal-system' ); ?></option>
+                                <option value="Réparateur"><?php esc_html_e( 'Réparateur', 'loyal-system' ); ?></option>
+                                <option value="Chauffeur"><?php esc_html_e( 'Chauffeur', 'loyal-system' ); ?></option>
+                                <option value="Monteur"><?php esc_html_e( 'Monteur', 'loyal-system' ); ?></option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="ls-pickup-name"><?php esc_html_e( 'Nom du responsable', 'loyal-system' ); ?> *</label></th>
                         <td><input type="text" id="ls-pickup-name" name="name" class="regular-text" required></td>
                     </tr>
                     <tr>
@@ -39,6 +50,7 @@
         <thead>
             <tr>
                 <th style="width:40px;">#</th>
+                <th><?php esc_html_e( 'Catégorie', 'loyal-system' ); ?></th>
                 <th><?php esc_html_e( 'Nom', 'loyal-system' ); ?></th>
                 <th><?php esc_html_e( 'Téléphone', 'loyal-system' ); ?></th>
                 <th><?php esc_html_e( 'Plaque', 'loyal-system' ); ?></th>
@@ -47,17 +59,19 @@
         </thead>
         <tbody id="ls-pickups-tbody">
         <?php if ( empty( $pickups ) ) : ?>
-            <tr id="ls-no-pickups"><td colspan="5"><?php esc_html_e( 'Aucun chauffeur. Ajoutez-en un ci-dessus.', 'loyal-system' ); ?></td></tr>
+            <tr id="ls-no-pickups"><td colspan="6"><?php esc_html_e( 'Aucun responsable. Ajoutez-en un ci-dessus.', 'loyal-system' ); ?></td></tr>
         <?php else : ?>
             <?php foreach ( $pickups as $pk ) : ?>
             <tr id="ls-pickup-row-<?php echo (int) $pk->id; ?>">
                 <td><?php echo (int) $pk->id; ?></td>
+                <td class="ls-pk-category-<?php echo (int) $pk->id; ?>"><?php echo esc_html( $pk->category ?: '—' ); ?></td>
                 <td><strong class="ls-pk-name-<?php echo (int) $pk->id; ?>"><?php echo esc_html( $pk->name ); ?></strong></td>
                 <td class="ls-pk-phone-<?php echo (int) $pk->id; ?>"><?php echo esc_html( $pk->phone ?: '—' ); ?></td>
                 <td class="ls-pk-plate-<?php echo (int) $pk->id; ?>"><?php echo esc_html( $pk->plate_number ?: '—' ); ?></td>
                 <td>
                     <button type="button" class="button button-small ls-pickup-edit-btn"
                         data-id="<?php echo (int) $pk->id; ?>"
+                        data-category="<?php echo esc_attr( $pk->category ); ?>"
                         data-name="<?php echo esc_attr( $pk->name ); ?>"
                         data-phone="<?php echo esc_attr( $pk->phone ); ?>"
                         data-plate="<?php echo esc_attr( $pk->plate_number ); ?>">
@@ -70,8 +84,17 @@
                 </td>
             </tr>
             <tr class="ls-pickup-edit-row" id="ls-pickup-edit-<?php echo (int) $pk->id; ?>" style="display:none;">
-                <td colspan="5" style="background:#f9f9f9;padding:14px 20px;">
+                <td colspan="6" style="background:#f9f9f9;padding:14px 20px;">
                     <form class="ls-pickup-update-form" data-id="<?php echo (int) $pk->id; ?>" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+                        <div>
+                            <label style="display:block;font-weight:600;font-size:12px;margin-bottom:3px;"><?php esc_html_e( 'Catégorie', 'loyal-system' ); ?></label>
+                            <select name="category" style="width:130px;">
+                                <option value=""><?php esc_html_e( '— Choisir —', 'loyal-system' ); ?></option>
+                                <option value="Réparateur" <?php selected( $pk->category, 'Réparateur' ); ?>><?php esc_html_e( 'Réparateur', 'loyal-system' ); ?></option>
+                                <option value="Chauffeur"  <?php selected( $pk->category, 'Chauffeur' );  ?>><?php esc_html_e( 'Chauffeur', 'loyal-system' ); ?></option>
+                                <option value="Monteur"    <?php selected( $pk->category, 'Monteur' );    ?>><?php esc_html_e( 'Monteur', 'loyal-system' ); ?></option>
+                            </select>
+                        </div>
                         <div>
                             <label style="display:block;font-weight:600;font-size:12px;margin-bottom:3px;"><?php esc_html_e( 'Nom', 'loyal-system' ); ?></label>
                             <input type="text" name="name" value="<?php echo esc_attr( $pk->name ); ?>" class="regular-text">
@@ -109,6 +132,7 @@
         $.post(lsAdmin.ajaxUrl, {
             action:       'ls_admin_add_pickup',
             nonce:        lsAdmin.nonce,
+            category:     $('#ls-pickup-category').val(),
             name:         $('#ls-pickup-name').val(),
             phone:        $('#ls-pickup-phone').val(),
             plate_number: $('#ls-pickup-plate').val()
@@ -148,6 +172,7 @@
                 .text(resp.success ? resp.data.message : (resp.data&&resp.data.message?resp.data.message:lsAdmin.i18n.error))
                 .show();
             if (resp.success) {
+                $('.ls-pk-category-'+id).text($form.find('[name="category"]').val() || '—');
                 $('.ls-pk-name-'+id).text($form.find('[name="name"]').val());
                 $('.ls-pk-phone-'+id).text($form.find('[name="phone"]').val() || '—');
                 $('.ls-pk-plate-'+id).text($form.find('[name="plate_number"]').val() || '—');

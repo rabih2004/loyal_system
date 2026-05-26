@@ -1,17 +1,20 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit;
 
-$questions = array(
-    'q_presentable'     => array( 'text' => 'Le technicien était-il présentable et en uniforme ?',                     'type' => 'yesno' ),
-    'q_verified_before' => array( 'text' => 'Le technicien a-t-il vérifié les meubles avant de commencer le montage ?', 'type' => 'yesno' ),
-    'q_worked_fast'     => array( 'text' => 'Durant le montage, le technicien a-t-il travaillé rapidement ?',           'type' => 'yesno' ),
-    'q_tightened'       => array( 'text' => 'Le technicien a-t-il bien serré les meubles ?',                            'type' => 'yesno' ),
-    'q_verified_after'  => array( 'text' => 'Après le montage, avez-vous tout vérifié avec le technicien ?',            'type' => 'yesno' ),
-    'q_collaborated'    => array( 'text' => 'Le technicien a-t-il bien collaboré avec vous ?',                          'type' => 'yesno' ),
-    'q_on_time'         => array( 'text' => "Le technicien est-il arrivé à l'heure prévue ?",                           'type' => 'yesno' ),
-    'q_finish_time'     => array( 'text' => 'À quelle heure le technicien a-t-il terminé le montage ?',                 'type' => 'text',  'placeholder' => 'ex: 14h30' ),
-    'q_rating'          => array( 'text' => 'Quelle note sur 10 attribuez-vous au travail du technicien ?',             'type' => 'number','min' => 0, 'max' => 10 ),
-    'q_satisfied'       => array( 'text' => 'Êtes-vous satisfait(e) du service de montage ?',                          'type' => 'yesno' ),
-);
+$dashboard_url = $dashboard_url ?? '';
+$is_logged_in  = $is_logged_in  ?? false;
+$customer      = $customer      ?? null;
+
+if ( ! function_exists( 'ls_fb_pill_choices' ) ) :
+function ls_fb_pill_choices( string $name, array $options ) {
+    foreach ( $options as $value => $color_class ) :
+        $id = esc_attr( $name . '_' . preg_replace( '/[^a-z0-9]/', '_', strtolower( $value ) ) );
+        ?>
+        <input type="radio" id="<?php echo $id; ?>" name="<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( $value ); ?>" class="ls-fb-radio">
+        <label for="<?php echo $id; ?>" class="ls-fb-pill <?php echo esc_attr( $color_class ); ?>"><?php echo esc_html( $value ); ?></label>
+        <?php
+    endforeach;
+}
+endif;
 ?>
 <div class="ls-container ls-feedback-container">
 
@@ -34,9 +37,9 @@ $questions = array(
     <div id="ls-feedback-form-wrap">
         <!-- Header -->
         <div class="ls-fb-header">
-            <div class="ls-fb-header-icon">&#128295;</div>
-            <h2 class="ls-fb-header-title"><?php esc_html_e( 'Formulaire Montage', 'loyal-system' ); ?></h2>
-            <p class="ls-fb-header-sub"><?php esc_html_e( 'Veuillez évaluer le service de montage reçu.', 'loyal-system' ); ?></p>
+            <div class="ls-fb-header-icon">&#128297;</div>
+            <h2 class="ls-fb-header-title"><?php esc_html_e( 'Feedback Montage', 'loyal-system' ); ?></h2>
+            <p class="ls-fb-header-sub">Merci d'avoir choisi nos services pour le montage de votre meuble.<br>Votre satisfaction est importante pour nous.<br>Nous aimerions connaître votre avis concernant notre intervention.</p>
         </div>
 
         <div id="ls-feedback-msg" class="ls-message" role="alert" style="display:none;"></div>
@@ -65,38 +68,112 @@ $questions = array(
             <!-- Questions -->
             <div class="ls-card ls-fb-questions-card">
                 <h3 class="ls-fb-section-label"><?php esc_html_e( 'Évaluation', 'loyal-system' ); ?></h3>
-                <?php $i = 1; foreach ( $questions as $key => $q ) : ?>
+
+                <?php
+                $yesno = array(
+                    'q_verified_before' => 'Le technicien a-t-il vérifié les meubles avant de commencer le montage ?',
+                    'q_worked_fast'     => 'Durant le montage, le technicien a-t-il travaillé rapidement ?',
+                    'q_assembled_well'  => 'Le meuble a-t-il été monté correctement et proprement ?',
+                    'q_verified_after'  => 'Après le montage, avez-vous tout vérifié avec le technicien ?',
+                    'q_collaborated'    => 'Le technicien a-t-il bien collaboré avec vous ?',
+                    'q_on_time'         => "Le technicien est-il arrivé à l'heure prévue ?",
+                );
+                $i = 1;
+                foreach ( $yesno as $key => $text ) : ?>
                 <div class="ls-fb-question-card">
                     <div class="ls-fb-question-body">
                         <span class="ls-fb-qnum"><?php echo $i++; ?></span>
-                        <p class="ls-fb-question-text"><?php echo esc_html( $q['text'] ); ?></p>
+                        <p class="ls-fb-question-text"><?php echo esc_html( $text ); ?></p>
                     </div>
                     <div class="ls-fb-choices">
-                        <?php if ( $q['type'] === 'yesno' ) : ?>
-                            <input type="radio" id="<?php echo esc_attr( $key ); ?>_oui" name="<?php echo esc_attr( $key ); ?>" value="OUI" class="ls-fb-radio">
-                            <label for="<?php echo esc_attr( $key ); ?>_oui" class="ls-fb-pill ls-fb-pill--oui">OUI</label>
-                            <input type="radio" id="<?php echo esc_attr( $key ); ?>_non" name="<?php echo esc_attr( $key ); ?>" value="NON" class="ls-fb-radio">
-                            <label for="<?php echo esc_attr( $key ); ?>_non" class="ls-fb-pill ls-fb-pill--non">NON</label>
-                        <?php elseif ( $q['type'] === 'number' ) : ?>
-                            <input type="number" name="<?php echo esc_attr( $key ); ?>" class="ls-input ls-fb-number-input"
-                                min="<?php echo esc_attr( $q['min'] ?? 0 ); ?>"
-                                max="<?php echo esc_attr( $q['max'] ?? 10 ); ?>"
-                                placeholder="0–10">
-                        <?php else : ?>
-                            <input type="text" name="<?php echo esc_attr( $key ); ?>" class="ls-input ls-fb-text-input"
-                                placeholder="<?php echo esc_attr( $q['placeholder'] ?? '' ); ?>">
-                        <?php endif; ?>
+                        <input type="radio" id="<?php echo esc_attr( $key ); ?>_oui" name="<?php echo esc_attr( $key ); ?>" value="OUI" class="ls-fb-radio">
+                        <label for="<?php echo esc_attr( $key ); ?>_oui" class="ls-fb-pill ls-fb-pill--oui">OUI</label>
+                        <input type="radio" id="<?php echo esc_attr( $key ); ?>_non" name="<?php echo esc_attr( $key ); ?>" value="NON" class="ls-fb-radio">
+                        <label for="<?php echo esc_attr( $key ); ?>_non" class="ls-fb-pill ls-fb-pill--non">NON</label>
                     </div>
                 </div>
                 <?php endforeach; ?>
+
+                <!-- Q7: Heure de fin -->
+                <div class="ls-fb-question-card">
+                    <div class="ls-fb-question-body">
+                        <span class="ls-fb-qnum"><?php echo $i++; ?></span>
+                        <p class="ls-fb-question-text"><?php esc_html_e( 'À quelle heure le technicien a-t-il terminé le montage ?', 'loyal-system' ); ?></p>
+                    </div>
+                    <div class="ls-fb-choices">
+                        <input type="text" name="q_finish_time" class="ls-input ls-fb-text-input" placeholder="ex: 14h30">
+                    </div>
+                </div>
+
+                <!-- Q8: Professionnalisme (colored multi-choice) -->
+                <div class="ls-fb-question-card ls-fb-question-card--wrap">
+                    <div class="ls-fb-question-body">
+                        <span class="ls-fb-qnum"><?php echo $i++; ?></span>
+                        <p class="ls-fb-question-text"><?php esc_html_e( 'Comment évaluez-vous le professionnalisme de notre équipe ?', 'loyal-system' ); ?></p>
+                    </div>
+                    <div class="ls-fb-choices ls-fb-choices--wrap">
+                        <?php ls_fb_pill_choices( 'q_professionalism', array(
+                            'Excellent' => 'ls-fb-pill--green',
+                            'Bon'       => 'ls-fb-pill--lightgreen',
+                            'Moyen'     => 'ls-fb-pill--orange',
+                            'Mauvais'   => 'ls-fb-pill--red',
+                        ) ); ?>
+                    </div>
+                </div>
+
+                <!-- Q9: Satisfaction montage (colored multi-choice) -->
+                <div class="ls-fb-question-card ls-fb-question-card--wrap">
+                    <div class="ls-fb-question-body">
+                        <span class="ls-fb-qnum"><?php echo $i++; ?></span>
+                        <p class="ls-fb-question-text"><?php esc_html_e( 'Êtes-vous satisfait du montage effectué ?', 'loyal-system' ); ?></p>
+                    </div>
+                    <div class="ls-fb-choices ls-fb-choices--wrap">
+                        <?php ls_fb_pill_choices( 'q_satisfied', array(
+                            'Très satisfait' => 'ls-fb-pill--green',
+                            'Satisfait'      => 'ls-fb-pill--lightgreen',
+                            'Peu satisfait'  => 'ls-fb-pill--orange',
+                            'Pas satisfait'  => 'ls-fb-pill--red',
+                        ) ); ?>
+                    </div>
+                </div>
+
+                <!-- Q10: Délai d'intervention -->
+                <div class="ls-fb-question-card">
+                    <div class="ls-fb-question-body">
+                        <span class="ls-fb-qnum"><?php echo $i++; ?></span>
+                        <p class="ls-fb-question-text"><?php esc_html_e( "Le délai d'intervention vous a-t-il convenu ?", 'loyal-system' ); ?></p>
+                    </div>
+                    <div class="ls-fb-choices">
+                        <input type="radio" id="q_delay_ok_oui" name="q_delay_ok" value="OUI" class="ls-fb-radio">
+                        <label for="q_delay_ok_oui" class="ls-fb-pill ls-fb-pill--oui">OUI</label>
+                        <input type="radio" id="q_delay_ok_non" name="q_delay_ok" value="NON" class="ls-fb-radio">
+                        <label for="q_delay_ok_non" class="ls-fb-pill ls-fb-pill--non">NON</label>
+                    </div>
+                </div>
+
+                <!-- Q11: Recommandation (colored multi-choice) -->
+                <div class="ls-fb-question-card ls-fb-question-card--wrap">
+                    <div class="ls-fb-question-body">
+                        <span class="ls-fb-qnum"><?php echo $i++; ?></span>
+                        <p class="ls-fb-question-text"><?php esc_html_e( 'Recommanderez-vous nos services à votre entourage ?', 'loyal-system' ); ?></p>
+                    </div>
+                    <div class="ls-fb-choices ls-fb-choices--wrap">
+                        <?php ls_fb_pill_choices( 'q_recommend', array(
+                            'Oui'      => 'ls-fb-pill--green',
+                            'Peut-être'=> 'ls-fb-pill--orange',
+                            'Non'      => 'ls-fb-pill--red',
+                        ) ); ?>
+                    </div>
+                </div>
+
             </div>
 
-            <!-- Comment -->
+            <!-- Commentaires -->
             <div class="ls-card ls-fb-comment-card">
                 <div class="ls-form-group" style="margin:0;">
-                    <label class="ls-label"><?php esc_html_e( 'Commentaire (facultatif)', 'loyal-system' ); ?></label>
+                    <label class="ls-label"><?php esc_html_e( 'Commentaires ou suggestions (facultatif)', 'loyal-system' ); ?></label>
                     <textarea name="comment" class="ls-input" rows="3"
-                        placeholder="<?php esc_attr_e( 'Avez-vous quelque chose à ajouter ?', 'loyal-system' ); ?>"></textarea>
+                        placeholder="<?php esc_attr_e( 'Partagez vos remarques ou suggestions...', 'loyal-system' ); ?>"></textarea>
                 </div>
             </div>
 

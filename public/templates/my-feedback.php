@@ -6,6 +6,7 @@
 $dashboard_url   = $dashboard_url   ?? '';
 $maintenance_url = $maintenance_url ?? '#';
 $delivery_url    = $delivery_url    ?? '#';
+$montage_url     = $montage_url     ?? '#';
 $feedback        = $feedback        ?? array();
 ?>
 <div class="ls-container ls-my-feedback-container">
@@ -28,6 +29,11 @@ $feedback        = $feedback        ?? array();
                 &#128666; <?php esc_html_e( 'Avis livraison', 'loyal-system' ); ?>
             </a>
             <?php endif; ?>
+            <?php if ( $montage_url && $montage_url !== '#' ) : ?>
+            <a href="<?php echo esc_url( $montage_url ); ?>" class="ls-btn ls-btn-outline ls-btn-sm">
+                &#128297; <?php esc_html_e( 'Avis montage', 'loyal-system' ); ?>
+            </a>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -47,6 +53,11 @@ $feedback        = $feedback        ?? array();
                 <?php if ( $delivery_url && $delivery_url !== '#' ) : ?>
                 <a href="<?php echo esc_url( $delivery_url ); ?>" class="ls-btn ls-btn-outline">
                     &#128666; <?php esc_html_e( 'Soumettre un avis livraison', 'loyal-system' ); ?>
+                </a>
+                <?php endif; ?>
+                <?php if ( $montage_url && $montage_url !== '#' ) : ?>
+                <a href="<?php echo esc_url( $montage_url ); ?>" class="ls-btn ls-btn-outline">
+                    &#128297; <?php esc_html_e( 'Soumettre un avis montage', 'loyal-system' ); ?>
                 </a>
                 <?php endif; ?>
             </div>

@@ -402,12 +402,13 @@ class LS_Public_Ajax {
             wp_send_json_error( array( 'message' => __( 'Please select a branch / store.', 'loyal-system' ) ), 400 );
         }
 
-        $q_welcoming = sanitize_text_field( wp_unslash( $_POST['q_welcoming'] ?? '' ) );
-        $q_fast      = sanitize_text_field( wp_unslash( $_POST['q_fast']      ?? '' ) );
-        $q_quality   = min( 10, max( 1, (int) ( $_POST['q_quality']  ?? 5 ) ) );
-        $q_value     = min( 10, max( 1, (int) ( $_POST['q_value']    ?? 5 ) ) );
-        $q_recommend = sanitize_text_field( wp_unslash( $_POST['q_recommend'] ?? '' ) );
-        $comment     = sanitize_textarea_field( wp_unslash( $_POST['comment'] ?? '' ) );
+        // New form fields → stored in the same DB columns.
+        $q_welcoming = sanitize_text_field( wp_unslash( $_POST['q_visit_satisfied']  ?? '' ) );
+        $q_fast      = sanitize_text_field( wp_unslash( $_POST['q_team_welcome']     ?? '' ) );
+        $q_quality   = sanitize_text_field( wp_unslash( $_POST['q_found_products']   ?? '' ) );
+        $q_value     = sanitize_text_field( wp_unslash( $_POST['q_product_quality']  ?? '' ) );
+        $q_recommend = sanitize_text_field( wp_unslash( $_POST['q_recommend']        ?? '' ) );
+        $comment     = sanitize_textarea_field( wp_unslash( $_POST['comment']        ?? '' ) );
 
         // Resolve customer.
         $customer_id = 0;

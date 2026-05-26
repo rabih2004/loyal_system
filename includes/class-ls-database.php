@@ -107,16 +107,23 @@ class LS_Database {
             phone        VARCHAR(30)  NOT NULL DEFAULT '',
             full_name    VARCHAR(150) NOT NULL DEFAULT '',
             branch_id    INT UNSIGNED NOT NULL DEFAULT 0,
-            q_welcoming  VARCHAR(10)  NOT NULL DEFAULT '',
-            q_fast       VARCHAR(10)  NOT NULL DEFAULT '',
-            q_quality    TINYINT UNSIGNED NOT NULL DEFAULT 0,
-            q_value      TINYINT UNSIGNED NOT NULL DEFAULT 0,
-            q_recommend  VARCHAR(10)  NOT NULL DEFAULT '',
+            q_welcoming  VARCHAR(100) NOT NULL DEFAULT '',
+            q_fast       VARCHAR(100) NOT NULL DEFAULT '',
+            q_quality    VARCHAR(100) NOT NULL DEFAULT '',
+            q_value      VARCHAR(100) NOT NULL DEFAULT '',
+            q_recommend  VARCHAR(100) NOT NULL DEFAULT '',
             comment      TEXT         NOT NULL DEFAULT '',
             submitted_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY customer_id (customer_id)
         ) $charset;" );
+
+        // Migrate existing installs: widen merchant feedback columns for text answers.
+        $wpdb->query( "ALTER TABLE {$p}feedback_merchant MODIFY COLUMN q_welcoming VARCHAR(100) NOT NULL DEFAULT ''" );
+        $wpdb->query( "ALTER TABLE {$p}feedback_merchant MODIFY COLUMN q_fast      VARCHAR(100) NOT NULL DEFAULT ''" );
+        $wpdb->query( "ALTER TABLE {$p}feedback_merchant MODIFY COLUMN q_quality   VARCHAR(100) NOT NULL DEFAULT ''" );
+        $wpdb->query( "ALTER TABLE {$p}feedback_merchant MODIFY COLUMN q_value     VARCHAR(100) NOT NULL DEFAULT ''" );
+        $wpdb->query( "ALTER TABLE {$p}feedback_merchant MODIFY COLUMN q_recommend VARCHAR(100) NOT NULL DEFAULT ''" );
 
         dbDelta( "
         CREATE TABLE {$p}ticket_categories (
@@ -163,12 +170,14 @@ class LS_Database {
         dbDelta( "
         CREATE TABLE {$p}pickups (
             id           INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            category     VARCHAR(50)  NOT NULL DEFAULT '',
             name         VARCHAR(150) NOT NULL,
             phone        VARCHAR(30)  NOT NULL DEFAULT '',
             plate_number VARCHAR(50)  NOT NULL DEFAULT '',
             created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id)
         ) $charset;" );
+        $wpdb->query( "ALTER TABLE {$p}pickups ADD COLUMN IF NOT EXISTS category VARCHAR(50) NOT NULL DEFAULT '' AFTER id" );
 
         dbDelta( "
         CREATE TABLE {$p}interventions (
@@ -587,7 +596,7 @@ class LS_Database {
             "SELECT i.*,
                     c.full_name   AS customer_name,  c.phone    AS customer_phone,
                     c.address     AS customer_address,
-                    p.name        AS pickup_name,     p.plate_number AS pickup_plate,
+                    p.category    AS pickup_category, p.name AS pickup_name, p.plate_number AS pickup_plate,
                     p.phone       AS pickup_phone,
                     b.name        AS branch_name
                FROM {$p}interventions i

@@ -783,6 +783,48 @@
     box-shadow: 0 2px 8px rgba(220,38,38,.25);
 }
 
+/* ── Colored pill variants (multi-choice questions) ──────────────────── */
+
+/* Default (unselected) */
+.ls-fb-pill--green      { color: #166534; border-color: #86efac; background: #f0fdf4; }
+.ls-fb-pill--lightgreen { color: #15803d; border-color: #bbf7d0; background: #f0fdf4; }
+.ls-fb-pill--blue       { color: #1d4ed8; border-color: #93c5fd; background: #eff6ff; }
+.ls-fb-pill--orange     { color: #c2410c; border-color: #fdba74; background: #fff7ed; }
+.ls-fb-pill--red        { color: #991b1b; border-color: #fca5a5; background: #fef2f2; }
+
+/* Hover */
+.ls-fb-pill--green:hover      { background: #dcfce7; border-color: #4ade80; }
+.ls-fb-pill--lightgreen:hover { background: #dcfce7; border-color: #86efac; }
+.ls-fb-pill--blue:hover       { background: #dbeafe; border-color: #60a5fa; }
+.ls-fb-pill--orange:hover     { background: #ffedd5; border-color: #fb923c; }
+.ls-fb-pill--red:hover        { background: #fee2e2; border-color: #f87171; }
+
+/* Selected */
+.ls-fb-radio:checked + .ls-fb-pill--green {
+    background: #16a34a; color: #fff; border-color: #16a34a;
+    box-shadow: 0 2px 8px rgba(22,163,74,.25);
+}
+.ls-fb-radio:checked + .ls-fb-pill--lightgreen {
+    background: #22c55e; color: #fff; border-color: #22c55e;
+    box-shadow: 0 2px 8px rgba(34,197,94,.25);
+}
+.ls-fb-radio:checked + .ls-fb-pill--blue {
+    background: #3b82f6; color: #fff; border-color: #3b82f6;
+    box-shadow: 0 2px 8px rgba(59,130,246,.25);
+}
+.ls-fb-radio:checked + .ls-fb-pill--orange {
+    background: #f97316; color: #fff; border-color: #f97316;
+    box-shadow: 0 2px 8px rgba(249,115,22,.25);
+}
+.ls-fb-radio:checked + .ls-fb-pill--red {
+    background: #dc2626; color: #fff; border-color: #dc2626;
+    box-shadow: 0 2px 8px rgba(220,38,38,.25);
+}
+
+/* Wrap layout for multi-choice questions */
+.ls-fb-question-card--wrap { flex-wrap: wrap; }
+.ls-fb-choices--wrap { flex-wrap: wrap; gap: 8px; padding-top: 4px; }
+
 /* Inline number/text inputs in questions */
 .ls-fb-number-input {
     width: 90px !important;
@@ -861,6 +903,154 @@
     font-weight: 700;
     color: #92400e;
     margin-top: 6px;
+}
+
+/* ── Feedback: section sub-label ─────────────────────────────────────── */
+.ls-fb-section-sub {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: -8px 0 12px;
+}
+
+/* ── Feedback: radio list (multi-choice) ─────────────────────────────── */
+.ls-fb-choices--list {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding-top: 4px;
+}
+
+.ls-fb-radio-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #374151;
+    padding: 4px 0;
+}
+
+.ls-fb-radio-input {
+    accent-color: #d97706;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.ls-fb-radio-label:hover .ls-fb-radio-text { color: #111827; }
+
+/* ── Feedback: criteria table (section 3) ────────────────────────────── */
+.ls-fb-criteria-table {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.ls-fb-criteria-header,
+.ls-fb-criteria-row {
+    display: grid;
+    grid-template-columns: 1fr 64px 64px;
+    align-items: center;
+}
+
+.ls-fb-criteria-header {
+    background: #f9fafb;
+    padding: 8px 14px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.ls-fb-criteria-row {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.ls-fb-criteria-row:last-child { border-bottom: none; }
+
+.ls-fb-criteria-row:hover { background: #f9fafb; }
+
+.ls-fb-criteria-label {
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+.ls-fb-criteria-col {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ls-fb-criteria-col .ls-fb-radio-input {
+    margin: 0;
+}
+
+/* hide the default label text for criteria checkboxes */
+.ls-fb-criteria-check { display: none; }
+
+/* =========================================================================
+   FEEDBACK — RESPONSIVE (applies to all feedback & montage forms)
+   ========================================================================= */
+
+@media (max-width: 640px) {
+
+    /* Tighter outer padding */
+    .ls-feedback-container.ls-container { padding: 12px 10px; }
+
+    /* Smaller cards */
+    .ls-feedback-container .ls-card { padding: 14px 12px; }
+
+    /* Header shrinks */
+    .ls-fb-header { padding: 16px 8px 12px; }
+    .ls-fb-header-icon { font-size: 2rem; }
+    .ls-fb-header-title { font-size: 1.15rem; }
+    .ls-fb-header-sub { font-size: 0.82rem; }
+
+    /* Contact fields: each takes full width */
+    .ls-fb-contact-row { flex-direction: column; gap: 10px; }
+    .ls-fb-contact-row .ls-form-group { min-width: 0; width: 100%; flex: none; }
+
+    /* Question rows: stack text above choices */
+    .ls-fb-question-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px 0;
+    }
+
+    .ls-fb-question-body { min-width: 0; width: 100%; }
+
+    /* OUI/NON pills: stay side by side but full-row */
+    .ls-fb-choices { flex-shrink: 1; flex-wrap: wrap; width: 100%; }
+    .ls-fb-choices .ls-fb-pill { flex: 1; justify-content: center; min-width: 80px; }
+
+    /* Multi-choice wrap pills: 2 per row */
+    .ls-fb-choices--wrap { gap: 6px; width: 100%; }
+    .ls-fb-choices--wrap .ls-fb-pill {
+        flex: 1 1 calc(50% - 3px);
+        min-width: calc(50% - 3px);
+        max-width: 100%;
+        justify-content: center;
+        padding: 9px 10px;
+        font-size: 0.82rem;
+    }
+
+    /* Number / text inputs go full-width */
+    .ls-fb-number-input,
+    .ls-fb-text-input { width: 100% !important; }
+
+    /* Slider label text smaller */
+    .ls-fb-slider-labels { font-size: 0.72rem; }
+
+    /* Section labels smaller */
+    .ls-fb-section-label { font-size: 0.72rem; margin-bottom: 12px; }
+    .ls-fb-section-sub   { font-size: 0.8rem; }
 }
 
 /* =========================================================================

@@ -4,7 +4,7 @@
  * Plugin Name: Loyal System
  * Plugin URI:  #
  * Description: Customer loyalty points, invoice management, OTP phone login, and maintenance tickets.
- * Version:     1.2.0
+ * Version:     1.2.1
  * Author:      Custom
  * Text Domain: loyal-system
  *
@@ -15,7 +15,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-define('LS_VERSION',    '1.2.0');
+define('LS_VERSION',    '1.2.1');
 define('LS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('LS_PLUGIN_URL', plugin_dir_url(__FILE__));
 

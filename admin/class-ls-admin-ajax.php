@@ -589,9 +589,10 @@ class LS_Admin_Ajax {
     public static function handle_add_pickup() {
         self::verify( 'manage_options' );
 
-        $name  = sanitize_text_field( wp_unslash( $_POST['name']         ?? '' ) );
-        $phone = sanitize_text_field( wp_unslash( $_POST['phone']        ?? '' ) );
-        $plate = sanitize_text_field( wp_unslash( $_POST['plate_number'] ?? '' ) );
+        $category = sanitize_text_field( wp_unslash( $_POST['category']      ?? '' ) );
+        $name     = sanitize_text_field( wp_unslash( $_POST['name']          ?? '' ) );
+        $phone    = sanitize_text_field( wp_unslash( $_POST['phone']         ?? '' ) );
+        $plate    = sanitize_text_field( wp_unslash( $_POST['plate_number']  ?? '' ) );
 
         if ( empty( $name ) ) {
             wp_send_json_error( array( 'message' => __( 'Driver name is required.', 'loyal-system' ) ), 400 );
@@ -599,6 +600,7 @@ class LS_Admin_Ajax {
 
         global $wpdb;
         $wpdb->insert( $wpdb->prefix . 'ls_pickups', array(
+            'category'     => $category,
             'name'         => $name,
             'phone'        => $phone,
             'plate_number' => $plate,
@@ -622,6 +624,7 @@ class LS_Admin_Ajax {
         $wpdb->update(
             $wpdb->prefix . 'ls_pickups',
             array(
+                'category'     => sanitize_text_field( wp_unslash( $_POST['category']     ?? '' ) ),
                 'name'         => sanitize_text_field( wp_unslash( $_POST['name']         ?? '' ) ),
                 'phone'        => sanitize_text_field( wp_unslash( $_POST['phone']        ?? '' ) ),
                 'plate_number' => sanitize_text_field( wp_unslash( $_POST['plate_number'] ?? '' ) ),
@@ -724,12 +727,14 @@ class LS_Admin_Ajax {
             wp_send_json_error( array( 'message' => __( 'Invalid status.', 'loyal-system' ) ), 400 );
         }
 
+        $pickup_id = isset( $_POST['pickup_id'] ) ? (int) $_POST['pickup_id'] : null;
+
         global $wpdb;
-        $wpdb->update(
-            $wpdb->prefix . 'ls_interventions',
-            array( 'status' => $status, 'notes' => $notes ),
-            array( 'id' => $id )
-        );
+        $fields = array( 'status' => $status, 'notes' => $notes );
+        if ( $pickup_id !== null ) {
+            $fields['pickup_id'] = $pickup_id;
+        }
+        $wpdb->update( $wpdb->prefix . 'ls_interventions', $fields, array( 'id' => $id ) );
 
         wp_send_json_success( array( 'message' => __( 'Intervention updated.', 'loyal-system' ) ) );
     }

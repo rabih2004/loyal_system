@@ -13,7 +13,7 @@
         <h2 class="title"><?php esc_html_e( 'Customer Portal Pages', 'loyal-system' ); ?></h2>
         <p class="description"><?php esc_html_e( 'Select which WordPress pages contain each portal shortcode. Links are built from page ID so they survive permalink changes.', 'loyal-system' ); ?></p>
         <p class="description" style="margin-top:4px;"><strong><?php esc_html_e( 'Shortcodes:', 'loyal-system' ); ?></strong>
-            <code>[ls_login]</code> &bull; <code>[ls_dashboard]</code> &bull; <code>[ls_submit_ticket]</code> &bull; <code>[ls_my_tickets]</code> &bull; <code>[ls_ticket_detail]</code> &bull; <code>[ls_my_feedback]</code> &bull; <code>[ls_feedback_maintenance]</code> &bull; <code>[ls_feedback_delivery]</code> &bull; <code>[ls_feedback_merchant]</code>
+            <code>[ls_login]</code> &bull; <code>[ls_dashboard]</code> &bull; <code>[ls_submit_ticket]</code> &bull; <code>[ls_my_tickets]</code> &bull; <code>[ls_ticket_detail]</code> &bull; <code>[ls_my_feedback]</code> &bull; <code>[ls_feedback_maintenance]</code> &bull; <code>[ls_feedback_delivery]</code> &bull; <code>[ls_feedback_merchant]</code> &bull; <code>[ls_form_montage]</code> &bull; <code>[ls_my_interventions]</code>
         </p>
         <table class="form-table" role="presentation">
             <?php foreach ( $portal_pages as $option_key => $label ) : ?>
@@ -43,6 +43,50 @@
                 <td>
                     <input type="email" id="ls-support-email" name="support_email" value="<?php echo esc_attr( LS_Settings::support_email() ); ?>" class="regular-text">
                     <p class="description"><?php esc_html_e( 'New ticket notifications are sent to this address. Defaults to the site admin email.', 'loyal-system' ); ?></p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="ls-ticket-sms-message"><?php esc_html_e( 'SMS de confirmation ticket', 'loyal-system' ); ?></label></th>
+                <td>
+                    <textarea id="ls-ticket-sms-message" name="ticket_sms_message" rows="4" class="large-text"><?php echo esc_textarea( LS_Settings::ticket_sms_message() ); ?></textarea>
+                    <p class="description">
+                        <?php esc_html_e( 'Message envoyé au client par SMS dès qu\'il soumet un ticket maintenance. Laissez vide pour ne pas envoyer de SMS.', 'loyal-system' ); ?><br>
+                        <?php esc_html_e( 'Placeholders disponibles :', 'loyal-system' ); ?>
+                        <code>{ticket_id}</code> — <?php esc_html_e( 'numéro du ticket', 'loyal-system' ); ?>,
+                        <code>{customer_name}</code> — <?php esc_html_e( 'nom du client', 'loyal-system' ); ?>.
+                    </p>
+                </td>
+            </tr>
+        </table>
+
+        <hr>
+
+        <!-- ── Feedback SMS Notifications ────────────────────────────── -->
+        <h2 class="title"><?php esc_html_e( 'Feedback SMS Notifications', 'loyal-system' ); ?></h2>
+        <p class="description"><?php esc_html_e( 'Message envoyé au client par SMS dès qu\'il soumet un formulaire de feedback. Laissez vide pour ne pas envoyer de SMS. Placeholders : {customer_name}, {phone}.', 'loyal-system' ); ?></p>
+        <table class="form-table" role="presentation">
+            <tr>
+                <th><label for="ls-fb-maintenance-sms"><?php esc_html_e( 'SMS Feedback Maintenance', 'loyal-system' ); ?></label></th>
+                <td>
+                    <textarea id="ls-fb-maintenance-sms" name="feedback_maintenance_sms_message" rows="3" class="large-text"><?php echo esc_textarea( LS_Settings::feedback_maintenance_sms_message() ); ?></textarea>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="ls-fb-delivery-sms"><?php esc_html_e( 'SMS Feedback Livraison', 'loyal-system' ); ?></label></th>
+                <td>
+                    <textarea id="ls-fb-delivery-sms" name="feedback_delivery_sms_message" rows="3" class="large-text"><?php echo esc_textarea( LS_Settings::feedback_delivery_sms_message() ); ?></textarea>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="ls-fb-montage-sms"><?php esc_html_e( 'SMS Feedback Montage', 'loyal-system' ); ?></label></th>
+                <td>
+                    <textarea id="ls-fb-montage-sms" name="feedback_montage_sms_message" rows="3" class="large-text"><?php echo esc_textarea( LS_Settings::feedback_montage_sms_message() ); ?></textarea>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="ls-fb-merchant-sms"><?php esc_html_e( 'SMS Feedback Magasin', 'loyal-system' ); ?></label></th>
+                <td>
+                    <textarea id="ls-fb-merchant-sms" name="feedback_merchant_sms_message" rows="3" class="large-text"><?php echo esc_textarea( LS_Settings::feedback_merchant_sms_message() ); ?></textarea>
                 </td>
             </tr>
         </table>

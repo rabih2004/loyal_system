@@ -19,6 +19,7 @@ class LS_Public_Ajax {
             'ls_submit_ticket',
             'ls_submit_feedback',
             'ls_submit_merchant_feedback',
+            'ls_submit_montage',
         );
 
         $priv = array(
@@ -26,6 +27,7 @@ class LS_Public_Ajax {
             'ls_get_ledger',
             'ls_get_tickets',
             'ls_update_profile',
+            'ls_get_my_interventions',
         );
 
         foreach ( $nopriv as $action ) {
@@ -273,6 +275,18 @@ class LS_Public_Ajax {
         }
 
         $contact = $phone ?: LS_Session::get_customer_phone();
+
+        // SMS confirmation to customer
+        $sms_tpl = LS_Settings::ticket_sms_message();
+        if ( $sms_tpl && $contact ) {
+            $sms_body = str_replace(
+                array( '{ticket_id}', '{customer_name}' ),
+                array( $ticket_id,    $caller ),
+                $sms_tpl
+            );
+            LS_SMS::send( $contact, $sms_body );
+        }
+
         $body    = "New support ticket submitted.\r\n\r\n"
                  . "Ticket #:     {$ticket_id}\r\n"
                  . "Subject:      {$subject}\r\n"
@@ -340,6 +354,17 @@ class LS_Public_Ajax {
 
         if ( ! $inserted ) {
             wp_send_json_error( array( 'message' => __( 'Could not save feedback.', 'loyal-system' ) ), 500 );
+        }
+
+        // SMS confirmation to customer
+        $sms_tpl = LS_Settings::get( 'feedback_' . $type . '_sms_message', '' );
+        if ( $sms_tpl && $phone ) {
+            $sms_body = str_replace(
+                array( '{customer_name}', '{phone}' ),
+                array( $full_name ?: $phone, $phone ),
+                $sms_tpl
+            );
+            LS_SMS::send( $phone, $sms_body );
         }
 
         // ── Email notification ────────────────────────────────────────────────
@@ -414,6 +439,17 @@ class LS_Public_Ajax {
             wp_send_json_error( array( 'message' => __( 'Could not save feedback. Please try again.', 'loyal-system' ) ), 500 );
         }
 
+        // SMS confirmation to customer
+        $sms_tpl = LS_Settings::feedback_merchant_sms_message();
+        if ( $sms_tpl && $phone ) {
+            $sms_body = str_replace(
+                array( '{customer_name}', '{phone}' ),
+                array( $full_name ?: $phone, $phone ),
+                $sms_tpl
+            );
+            LS_SMS::send( $phone, $sms_body );
+        }
+
         // Email notification.
         $to      = LS_Settings::support_email();
         $site    = get_bloginfo( 'name' );
@@ -473,6 +509,78 @@ class LS_Public_Ajax {
         ) );
 
         wp_send_json_success( array( 'message' => __( 'Profile updated.', 'loyal-system' ) ) );
+    }
+
+    // ── Montage / Management feedback forms ────────────────────────────────────
+
+    private static function handle_form_feedback( $type ) {
+        self::verify_nonce();
+
+        $phone     = sanitize_text_field( wp_unslash( $_POST['phone']     ?? '' ) );
+        $full_name = sanitize_text_field( wp_unslash( $_POST['full_name'] ?? '' ) );
+        $comment   = sanitize_textarea_field( wp_unslash( $_POST['comment'] ?? '' ) );
+
+        if ( empty( $phone ) ) {
+            wp_send_json_error( array( 'message' => __( 'Phone number is required.', 'loyal-system' ) ), 400 );
+        }
+
+        $answers = array();
+        foreach ( $_POST as $key => $val ) {
+            if ( strpos( $key, 'q_' ) === 0 ) {
+                $answers[ sanitize_key( $key ) ] = sanitize_text_field( wp_unslash( $val ) );
+            }
+        }
+
+        $customer_id = 0;
+        if ( LS_Session::is_customer_logged_in() ) {
+            $customer_id = LS_Session::get_customer_id();
+        } else {
+            global $wpdb;
+            $found = $wpdb->get_var( $wpdb->prepare(
+                "SELECT id FROM {$wpdb->prefix}ls_customers WHERE phone = %s LIMIT 1", $phone
+            ) );
+            if ( $found ) { $customer_id = (int) $found; }
+        }
+
+        global $wpdb;
+        $inserted = $wpdb->insert( $wpdb->prefix . 'ls_feedback', array(
+            'type'        => $type,
+            'customer_id' => $customer_id,
+            'phone'       => $phone,
+            'full_name'   => $full_name,
+            'answers'     => wp_json_encode( $answers ),
+            'comment'     => $comment,
+        ) );
+
+        if ( ! $inserted ) {
+            wp_send_json_error( array( 'message' => __( 'Could not save feedback.', 'loyal-system' ) ), 500 );
+        }
+
+        // SMS confirmation to customer
+        $sms_tpl = LS_Settings::get( 'feedback_' . $type . '_sms_message', '' );
+        if ( $sms_tpl && $phone ) {
+            $sms_body = str_replace(
+                array( '{customer_name}', '{phone}' ),
+                array( $full_name ?: $phone, $phone ),
+                $sms_tpl
+            );
+            LS_SMS::send( $phone, $sms_body );
+        }
+
+        wp_send_json_success( array( 'message' => __( 'Thank you! Your feedback has been submitted.', 'loyal-system' ) ) );
+    }
+
+    public static function handle_submit_montage() {
+        self::handle_form_feedback( 'montage' );
+    }
+
+    // ── My Interventions ──────────────────────────────────────────────────────
+
+    public static function handle_get_my_interventions() {
+        self::verify_nonce();
+        $customer_id   = self::require_customer();
+        $interventions = LS_Database::get_interventions( array( 'customer_id' => $customer_id, 'limit' => 100 ) );
+        wp_send_json_success( $interventions );
     }
 
 }

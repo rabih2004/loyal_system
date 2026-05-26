@@ -37,6 +37,14 @@ class LS_Admin_Ajax {
             'ls_admin_add_category',
             'ls_admin_update_category',
             'ls_admin_delete_category',
+            // Pickups CRUD
+            'ls_admin_add_pickup',
+            'ls_admin_update_pickup',
+            'ls_admin_delete_pickup',
+            // Interventions CRUD
+            'ls_admin_add_intervention',
+            'ls_admin_update_intervention',
+            'ls_admin_delete_intervention',
         );
 
         foreach ( $actions as $action ) {
@@ -574,5 +582,169 @@ class LS_Admin_Ajax {
         $wpdb->delete( $wpdb->prefix . 'ls_ticket_categories', array( 'id' => $cat_id ) );
 
         wp_send_json_success( array( 'message' => __( 'Category deleted.', 'loyal-system' ) ) );
+    }
+
+    // ── Pickups ────────────────────────────────────────────────────────────────
+
+    public static function handle_add_pickup() {
+        self::verify( 'manage_options' );
+
+        $name  = sanitize_text_field( wp_unslash( $_POST['name']         ?? '' ) );
+        $phone = sanitize_text_field( wp_unslash( $_POST['phone']        ?? '' ) );
+        $plate = sanitize_text_field( wp_unslash( $_POST['plate_number'] ?? '' ) );
+
+        if ( empty( $name ) ) {
+            wp_send_json_error( array( 'message' => __( 'Driver name is required.', 'loyal-system' ) ), 400 );
+        }
+
+        global $wpdb;
+        $wpdb->insert( $wpdb->prefix . 'ls_pickups', array(
+            'name'         => $name,
+            'phone'        => $phone,
+            'plate_number' => $plate,
+        ) );
+
+        wp_send_json_success( array(
+            'message'   => __( 'Pickup added.', 'loyal-system' ),
+            'pickup_id' => $wpdb->insert_id,
+        ) );
+    }
+
+    public static function handle_update_pickup() {
+        self::verify( 'manage_options' );
+
+        $pickup_id = (int) ( $_POST['pickup_id'] ?? 0 );
+        if ( ! $pickup_id ) {
+            wp_send_json_error( array( 'message' => __( 'Invalid pickup.', 'loyal-system' ) ), 400 );
+        }
+
+        global $wpdb;
+        $wpdb->update(
+            $wpdb->prefix . 'ls_pickups',
+            array(
+                'name'         => sanitize_text_field( wp_unslash( $_POST['name']         ?? '' ) ),
+                'phone'        => sanitize_text_field( wp_unslash( $_POST['phone']        ?? '' ) ),
+                'plate_number' => sanitize_text_field( wp_unslash( $_POST['plate_number'] ?? '' ) ),
+            ),
+            array( 'id' => $pickup_id )
+        );
+
+        wp_send_json_success( array( 'message' => __( 'Pickup updated.', 'loyal-system' ) ) );
+    }
+
+    public static function handle_delete_pickup() {
+        self::verify( 'manage_options' );
+
+        $pickup_id = (int) ( $_POST['pickup_id'] ?? 0 );
+        if ( ! $pickup_id ) {
+            wp_send_json_error( array( 'message' => __( 'Invalid pickup.', 'loyal-system' ) ), 400 );
+        }
+
+        global $wpdb;
+        $wpdb->delete( $wpdb->prefix . 'ls_pickups', array( 'id' => $pickup_id ) );
+
+        wp_send_json_success( array( 'message' => __( 'Pickup deleted.', 'loyal-system' ) ) );
+    }
+
+    // ── Interventions ─────────────────────────────────────────────────────────
+
+    public static function handle_add_intervention() {
+        self::verify( 'manage_options' );
+
+        $customer_id  = (int) ( $_POST['customer_id']  ?? 0 );
+        $pickup_id    = (int) ( $_POST['pickup_id']    ?? 0 );
+        $branch_id    = (int) ( $_POST['branch_id']    ?? 0 );
+        $type         = sanitize_key( $_POST['type']         ?? 'livraison' );
+        $scheduled_at = sanitize_text_field( wp_unslash( $_POST['scheduled_at'] ?? '' ) );
+        $status       = sanitize_key( $_POST['status']       ?? 'pending' );
+        $notes        = sanitize_textarea_field( wp_unslash( $_POST['notes']    ?? '' ) );
+
+        $allowed_types    = array( 'livraison', 'montage', 'maintenance' );
+        $allowed_statuses = array( 'pending', 'confirmed', 'en_route', 'completed', 'cancelled' );
+
+        if ( ! $customer_id ) {
+            wp_send_json_error( array( 'message' => __( 'Customer is required.', 'loyal-system' ) ), 400 );
+        }
+        if ( ! in_array( $type, $allowed_types, true ) ) {
+            wp_send_json_error( array( 'message' => __( 'Invalid type.', 'loyal-system' ) ), 400 );
+        }
+        if ( empty( $scheduled_at ) ) {
+            wp_send_json_error( array( 'message' => __( 'Scheduled date/time is required.', 'loyal-system' ) ), 400 );
+        }
+        if ( ! in_array( $status, $allowed_statuses, true ) ) {
+            $status = 'pending';
+        }
+
+        // Optional file attachment.
+        $attachment_path = '';
+        if ( ! empty( $_FILES['attachment']['tmp_name'] ) ) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+            $upload_dir = wp_upload_dir();
+            $dest_dir   = $upload_dir['basedir'] . '/ls-interventions';
+            wp_mkdir_p( $dest_dir );
+            $file_name = sanitize_file_name( $_FILES['attachment']['name'] );
+            $dest      = $dest_dir . '/' . uniqid() . '_' . $file_name;
+            if ( move_uploaded_file( $_FILES['attachment']['tmp_name'], $dest ) ) {
+                $attachment_path = '/ls-interventions/' . basename( $dest );
+            }
+        }
+
+        global $wpdb;
+        $wpdb->insert( $wpdb->prefix . 'ls_interventions', array(
+            'pickup_id'       => $pickup_id,
+            'customer_id'     => $customer_id,
+            'type'            => $type,
+            'attachment_path' => $attachment_path,
+            'scheduled_at'    => $scheduled_at,
+            'branch_id'       => $branch_id,
+            'status'          => $status,
+            'notes'           => $notes,
+            'created_by'      => get_current_user_id(),
+        ) );
+
+        wp_send_json_success( array(
+            'message'         => __( 'Intervention added.', 'loyal-system' ),
+            'intervention_id' => $wpdb->insert_id,
+        ) );
+    }
+
+    public static function handle_update_intervention() {
+        self::verify( 'manage_options' );
+
+        $id     = (int) ( $_POST['intervention_id'] ?? 0 );
+        $status = sanitize_key( $_POST['status'] ?? '' );
+        $notes  = sanitize_textarea_field( wp_unslash( $_POST['notes'] ?? '' ) );
+
+        if ( ! $id ) {
+            wp_send_json_error( array( 'message' => __( 'Invalid intervention.', 'loyal-system' ) ), 400 );
+        }
+
+        $allowed = array( 'pending', 'confirmed', 'en_route', 'completed', 'cancelled' );
+        if ( ! in_array( $status, $allowed, true ) ) {
+            wp_send_json_error( array( 'message' => __( 'Invalid status.', 'loyal-system' ) ), 400 );
+        }
+
+        global $wpdb;
+        $wpdb->update(
+            $wpdb->prefix . 'ls_interventions',
+            array( 'status' => $status, 'notes' => $notes ),
+            array( 'id' => $id )
+        );
+
+        wp_send_json_success( array( 'message' => __( 'Intervention updated.', 'loyal-system' ) ) );
+    }
+
+    public static function handle_delete_intervention() {
+        self::verify( 'manage_options' );
+
+        $id = (int) ( $_POST['intervention_id'] ?? 0 );
+        if ( ! $id ) {
+            wp_send_json_error( array( 'message' => __( 'Invalid intervention.', 'loyal-system' ) ), 400 );
+        }
+
+        global $wpdb;
+        $wpdb->delete( $wpdb->prefix . 'ls_interventions', array( 'id' => $id ) );
+
+        wp_send_json_success( array( 'message' => __( 'Intervention deleted.', 'loyal-system' ) ) );
     }
 }

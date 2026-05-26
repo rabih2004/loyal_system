@@ -159,6 +159,36 @@ class LS_Database {
             PRIMARY KEY (id),
             KEY ticket_id (ticket_id)
         ) $charset;" );
+
+        dbDelta( "
+        CREATE TABLE {$p}pickups (
+            id           INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            name         VARCHAR(150) NOT NULL,
+            phone        VARCHAR(30)  NOT NULL DEFAULT '',
+            plate_number VARCHAR(50)  NOT NULL DEFAULT '',
+            created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id)
+        ) $charset;" );
+
+        dbDelta( "
+        CREATE TABLE {$p}interventions (
+            id              INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            pickup_id       INT UNSIGNED NOT NULL DEFAULT 0,
+            customer_id     INT UNSIGNED NOT NULL DEFAULT 0,
+            type            VARCHAR(30)  NOT NULL DEFAULT 'livraison',
+            attachment_path VARCHAR(500) NOT NULL DEFAULT '',
+            scheduled_at    DATETIME     NOT NULL,
+            branch_id       INT UNSIGNED NOT NULL DEFAULT 0,
+            status          VARCHAR(30)  NOT NULL DEFAULT 'pending',
+            notes           TEXT         NOT NULL DEFAULT '',
+            created_by      BIGINT       NOT NULL DEFAULT 0,
+            created_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY customer_id (customer_id),
+            KEY pickup_id   (pickup_id),
+            KEY status      (status)
+        ) $charset;" );
     }
 
     // ── Balance ────────────────────────────────────────────────────────────────
@@ -493,6 +523,110 @@ class LS_Database {
     public static function count_merchant_feedback() {
         global $wpdb;
         return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}ls_feedback_merchant" );
+    }
+
+    // ── Pickups ────────────────────────────────────────────────────────────────
+
+    public static function get_all_pickups() {
+        global $wpdb;
+        return $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}ls_pickups ORDER BY name ASC" );
+    }
+
+    // ── Interventions ─────────────────────────────────────────────────────────
+
+    public static function get_interventions( $args = array() ) {
+        global $wpdb;
+        $p = $wpdb->prefix . 'ls_';
+
+        $defaults = array(
+            'status'      => '',
+            'pickup_id'   => 0,
+            'customer_id' => 0,
+            'date_from'   => '',
+            'date_to'     => '',
+            'search'      => '',
+            'limit'       => 50,
+            'offset'      => 0,
+        );
+        $args  = wp_parse_args( $args, $defaults );
+        $where = '1=1';
+        $vals  = array();
+
+        if ( ! empty( $args['status'] ) ) {
+            $where .= ' AND i.status = %s';
+            $vals[] = $args['status'];
+        }
+        if ( ! empty( $args['pickup_id'] ) ) {
+            $where .= ' AND i.pickup_id = %d';
+            $vals[] = (int) $args['pickup_id'];
+        }
+        if ( ! empty( $args['customer_id'] ) ) {
+            $where .= ' AND i.customer_id = %d';
+            $vals[] = (int) $args['customer_id'];
+        }
+        if ( ! empty( $args['date_from'] ) ) {
+            $where .= ' AND DATE(i.scheduled_at) >= %s';
+            $vals[] = $args['date_from'];
+        }
+        if ( ! empty( $args['date_to'] ) ) {
+            $where .= ' AND DATE(i.scheduled_at) <= %s';
+            $vals[] = $args['date_to'];
+        }
+        if ( ! empty( $args['search'] ) ) {
+            $like   = '%' . $wpdb->esc_like( $args['search'] ) . '%';
+            $where .= ' AND (c.full_name LIKE %s OR c.phone LIKE %s OR p.name LIKE %s)';
+            $vals[] = $like;
+            $vals[] = $like;
+            $vals[] = $like;
+        }
+
+        $vals[] = (int) $args['limit'];
+        $vals[] = (int) $args['offset'];
+
+        return $wpdb->get_results( $wpdb->prepare(
+            "SELECT i.*,
+                    c.full_name   AS customer_name,  c.phone    AS customer_phone,
+                    c.address     AS customer_address,
+                    p.name        AS pickup_name,     p.plate_number AS pickup_plate,
+                    p.phone       AS pickup_phone,
+                    b.name        AS branch_name
+               FROM {$p}interventions i
+          LEFT JOIN {$p}customers c ON c.id = i.customer_id
+          LEFT JOIN {$p}pickups   p ON p.id = i.pickup_id
+          LEFT JOIN {$p}branches  b ON b.id = i.branch_id
+              WHERE $where
+           ORDER BY i.scheduled_at DESC
+              LIMIT %d OFFSET %d",
+            ...$vals
+        ) );
+    }
+
+    public static function count_interventions( $args = array() ) {
+        global $wpdb;
+        $p = $wpdb->prefix . 'ls_';
+
+        $defaults = array( 'status' => '', 'pickup_id' => 0, 'customer_id' => 0, 'date_from' => '', 'date_to' => '', 'search' => '' );
+        $args  = wp_parse_args( $args, $defaults );
+        $where = '1=1';
+        $vals  = array();
+
+        if ( ! empty( $args['status'] ) )      { $where .= ' AND i.status = %s';              $vals[] = $args['status']; }
+        if ( ! empty( $args['pickup_id'] ) )   { $where .= ' AND i.pickup_id = %d';           $vals[] = (int) $args['pickup_id']; }
+        if ( ! empty( $args['customer_id'] ) ) { $where .= ' AND i.customer_id = %d';         $vals[] = (int) $args['customer_id']; }
+        if ( ! empty( $args['date_from'] ) )   { $where .= ' AND DATE(i.scheduled_at) >= %s'; $vals[] = $args['date_from']; }
+        if ( ! empty( $args['date_to'] ) )     { $where .= ' AND DATE(i.scheduled_at) <= %s'; $vals[] = $args['date_to']; }
+        if ( ! empty( $args['search'] ) ) {
+            $like   = '%' . $wpdb->esc_like( $args['search'] ) . '%';
+            $where .= ' AND (c.full_name LIKE %s OR c.phone LIKE %s OR p.name LIKE %s)';
+            $vals[] = $like; $vals[] = $like; $vals[] = $like;
+        }
+
+        $sql = "SELECT COUNT(*) FROM {$p}interventions i
+                LEFT JOIN {$p}customers c ON c.id = i.customer_id
+                LEFT JOIN {$p}pickups   p ON p.id = i.pickup_id
+                WHERE $where";
+
+        return empty( $vals ) ? (int) $wpdb->get_var( $sql ) : (int) $wpdb->get_var( $wpdb->prepare( $sql, ...$vals ) );
     }
 
     // ── Analytics ─────────────────────────────────────────────────────────────

@@ -32,7 +32,12 @@ class LS_Settings {
 
     // ── Convenience getters ──────────────────────────────────────────────────
 
-    public static function support_email()         { return self::get( 'support_email', get_option( 'admin_email' ) ); }
+    public static function support_email()           { return self::get( 'support_email', get_option( 'admin_email' ) ); }
+    public static function ticket_sms_message()                { return self::get( 'ticket_sms_message', '' ); }
+    public static function feedback_maintenance_sms_message() { return self::get( 'feedback_maintenance_sms_message', '' ); }
+    public static function feedback_delivery_sms_message()    { return self::get( 'feedback_delivery_sms_message', '' ); }
+    public static function feedback_montage_sms_message()     { return self::get( 'feedback_montage_sms_message', '' ); }
+    public static function feedback_merchant_sms_message()    { return self::get( 'feedback_merchant_sms_message', '' ); }
     public static function sms_provider()         { return self::get( 'sms_provider', 'test' ); }
     public static function twilio_sid()            { return self::get( 'twilio_sid', '' ); }
     public static function twilio_token()          { return self::get( 'twilio_token', '' ); }
@@ -61,6 +66,8 @@ class LS_Settings {
     public static function feedback_delivery_page_id()      { return (int) get_option( 'ls_feedback_delivery_page_id', 0 ); }
     public static function my_feedback_page_id()            { return (int) get_option( 'ls_my_feedback_page_id', 0 ); }
     public static function feedback_merchant_page_id()      { return (int) get_option( 'ls_feedback_merchant_page_id', 0 ); }
+    public static function form_montage_page_id()           { return (int) get_option( 'ls_form_montage_page_id', 0 ); }
+    public static function my_interventions_page_id()       { return (int) get_option( 'ls_my_interventions_page_id', 0 ); }
 
     public static function login_url() {
         $id = self::login_page_id();

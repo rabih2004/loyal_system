@@ -4,7 +4,7 @@
  * Plugin Name: Loyal System
  * Plugin URI:  #
  * Description: Customer loyalty points, invoice management, OTP phone login, and maintenance tickets.
- * Version:     1.1.2
+ * Version:     1.2.0
  * Author:      Custom
  * Text Domain: loyal-system
  *
@@ -15,7 +15,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-define('LS_VERSION',    '1.1.2');
+define('LS_VERSION',    '1.2.0');
 define('LS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('LS_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -103,6 +103,8 @@ add_action('wp', function () {
         LS_Settings::feedback_delivery_page_id(),
         LS_Settings::my_feedback_page_id(),
         LS_Settings::feedback_merchant_page_id(),
+        LS_Settings::form_montage_page_id(),
+        LS_Settings::my_interventions_page_id(),
     ]);
     if (is_page($portal_ids)) {
         add_filter('body_class', function ($classes) {

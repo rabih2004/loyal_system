@@ -36,6 +36,32 @@ class LS_SMS {
     }
 
     /**
+     * Send a plain text message via the configured provider.
+     *
+     * @param  string $phone
+     * @param  string $message
+     * @return true|WP_Error
+     */
+    public static function send( $phone, $message ) {
+        $provider = LS_Settings::sms_provider();
+
+        switch ( $provider ) {
+            case 'twilio':
+                return self::send_twilio( $phone, $message );
+            case 'http':
+                return self::send_http( $phone, $message, '' );
+            case 'orangesmspro':
+                return self::send_orangesmspro( $phone, $message );
+            case 'orangeapi':
+                return self::send_orangeapi( $phone, $message );
+            case 'test':
+            default:
+                error_log( "[LS SMS TEST] Phone: {$phone} | Message: {$message}" );
+                return true;
+        }
+    }
+
+    /**
      * Send via Twilio REST API.
      */
     private static function send_twilio( $phone, $message ) {

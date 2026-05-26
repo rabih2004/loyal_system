@@ -1,4 +1,13 @@
-<?php if ( ! defined( 'ABSPATH' ) ) exit; ?>
+<?php if ( ! defined( 'ABSPATH' ) ) exit;
+/** @var string $dashboard_url */
+/** @var string $maintenance_url */
+/** @var string $delivery_url */
+/** @var array  $feedback */
+$dashboard_url   = $dashboard_url   ?? '';
+$maintenance_url = $maintenance_url ?? '#';
+$delivery_url    = $delivery_url    ?? '#';
+$feedback        = $feedback        ?? array();
+?>
 <div class="ls-container ls-my-feedback-container">
 
     <!-- Top bar -->
@@ -48,10 +57,15 @@
         <div class="ls-myfb-list">
         <?php foreach ( $feedback as $fb ) :
             $answers      = json_decode( $fb->answers, true ) ?: array();
-            $is_maint     = ( $fb->type === 'maintenance' );
-            $type_label   = $is_maint ? __( 'Maintenance', 'loyal-system' ) : __( 'Livraison', 'loyal-system' );
-            $type_class   = $is_maint ? 'ls-myfb-type--maintenance' : 'ls-myfb-type--delivery';
-            $type_icon    = $is_maint ? '&#128295;' : '&#128666;';
+            $type_map = array(
+                'maintenance' => array( 'label' => __( 'Maintenance',      'loyal-system' ), 'class' => 'ls-myfb-type--maintenance', 'icon' => '&#128295;' ),
+                'delivery'    => array( 'label' => __( 'Livraison',         'loyal-system' ), 'class' => 'ls-myfb-type--delivery',    'icon' => '&#128666;' ),
+                'montage'     => array( 'label' => __( 'Montage',           'loyal-system' ), 'class' => 'ls-myfb-type--montage',     'icon' => '&#128297;' ),
+            );
+            $type_info  = $type_map[ $fb->type ] ?? array( 'label' => ucfirst( $fb->type ), 'class' => 'ls-myfb-type--other', 'icon' => '&#128203;' );
+            $type_label = $type_info['label'];
+            $type_class = $type_info['class'];
+            $type_icon  = $type_info['icon'];
 
             // Score: count OUI answers
             $total  = count( $answers );

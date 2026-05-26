@@ -22,6 +22,8 @@ class LS_Shortcodes {
             'ls_feedback_delivery'    => 'render_feedback_delivery',
             'ls_my_feedback'          => 'render_my_feedback',
             'ls_feedback_merchant'    => 'render_feedback_merchant',
+            'ls_form_montage'         => 'render_form_montage',
+            'ls_my_interventions'     => 'render_my_interventions',
         );
 
         foreach ( $map as $tag => $method ) {
@@ -194,6 +196,26 @@ class LS_Shortcodes {
         $dashboard_url = ( $is_logged_in && LS_Settings::dashboard_page_id() )
             ? get_permalink( LS_Settings::dashboard_page_id() ) : '';
         return self::render_template( 'feedback-delivery', compact( 'is_logged_in', 'customer', 'dashboard_url' ), $content );
+    }
+
+    public static function render_form_montage( $atts, $content = null ) {
+        $is_logged_in  = LS_Session::is_customer_logged_in();
+        $customer      = $is_logged_in ? LS_Customer::get_current() : null;
+        $dashboard_url = ( $is_logged_in && LS_Settings::dashboard_page_id() )
+            ? get_permalink( LS_Settings::dashboard_page_id() ) : '';
+        return self::render_template( 'form-montage', compact( 'is_logged_in', 'customer', 'dashboard_url' ), $content );
+    }
+
+    public static function render_my_interventions( $atts, $content = null ) {
+        if ( ! LS_Session::is_customer_logged_in() ) {
+            return self::redirect_to_login();
+        }
+        global $wpdb;
+        $customer_id   = LS_Session::get_customer_id();
+        $interventions = LS_Database::get_interventions( array( 'customer_id' => $customer_id, 'limit' => 100 ) );
+        $dashboard_url = LS_Settings::dashboard_page_id()
+            ? get_permalink( LS_Settings::dashboard_page_id() ) : '';
+        return self::render_template( 'my-interventions', compact( 'interventions', 'dashboard_url' ), $content );
     }
 
     /**

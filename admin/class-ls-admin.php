@@ -38,8 +38,10 @@ class LS_Admin {
             add_submenu_page( 'ls-dashboard', __( 'Customers',   'loyal-system' ), __( 'Customers',   'loyal-system' ), 'manage_options', 'ls-customers',   array( __CLASS__, 'render_customers_page' ) );
             add_submenu_page( 'ls-dashboard', __( 'Branches',    'loyal-system' ), __( 'Branches',    'loyal-system' ), 'manage_options', 'ls-branches',    array( __CLASS__, 'render_branches_page' ) );
             add_submenu_page( 'ls-dashboard', __( 'Categories',  'loyal-system' ), __( 'Categories',  'loyal-system' ), 'manage_options', 'ls-categories',  array( __CLASS__, 'render_categories_page' ) );
-            add_submenu_page( 'ls-dashboard', __( 'Feedback',    'loyal-system' ), __( 'Feedback',    'loyal-system' ), 'manage_options', 'ls-feedback',    array( __CLASS__, 'render_feedback_page' ) );
-            add_submenu_page( 'ls-dashboard', __( 'Settings',    'loyal-system' ), __( 'Settings',    'loyal-system' ), 'manage_options', 'ls-settings',    array( __CLASS__, 'render_settings_page' ) );
+            add_submenu_page( 'ls-dashboard', __( 'Feedback',      'loyal-system' ), __( 'Feedback',      'loyal-system' ), 'manage_options', 'ls-feedback',      array( __CLASS__, 'render_feedback_page' ) );
+            add_submenu_page( 'ls-dashboard', __( 'Pickups',       'loyal-system' ), __( 'Pickups',       'loyal-system' ), 'manage_options', 'ls-pickups',       array( __CLASS__, 'render_pickups_page' ) );
+            add_submenu_page( 'ls-dashboard', __( 'Interventions', 'loyal-system' ), __( 'Interventions', 'loyal-system' ), 'manage_options', 'ls-interventions', array( __CLASS__, 'render_interventions_page' ) );
+            add_submenu_page( 'ls-dashboard', __( 'Settings',      'loyal-system' ), __( 'Settings',      'loyal-system' ), 'manage_options', 'ls-settings',      array( __CLASS__, 'render_settings_page' ) );
         } else {
             // Staff: only invoices + credits
             add_submenu_page( 'ls-invoices', __( 'Invoices', 'loyal-system' ), __( 'Invoices', 'loyal-system' ), 'read', 'ls-invoices', array( __CLASS__, 'render_invoices_page' ) );
@@ -187,6 +189,57 @@ class LS_Admin {
         include LS_PLUGIN_DIR . 'admin/views/feedback.php';
     }
 
+    public static function render_pickups_page() {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( esc_html__( 'Access denied.', 'loyal-system' ) );
+        }
+        $pickups = LS_Database::get_all_pickups();
+        include LS_PLUGIN_DIR . 'admin/views/pickups.php';
+    }
+
+    public static function render_interventions_page() {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( esc_html__( 'Access denied.', 'loyal-system' ) );
+        }
+
+        $status_filter   = sanitize_key( $_GET['status']    ?? '' );
+        $pickup_filter   = (int) ( $_GET['pickup_id']       ?? 0 );
+        $date_from       = sanitize_text_field( wp_unslash( $_GET['date_from'] ?? '' ) );
+        $date_to         = sanitize_text_field( wp_unslash( $_GET['date_to']   ?? '' ) );
+        $search          = sanitize_text_field( wp_unslash( $_GET['s']         ?? '' ) );
+        $paged           = max( 1, (int) ( $_GET['paged']   ?? 1 ) );
+        $per_page        = 50;
+
+        $filter_args = array(
+            'status'    => $status_filter,
+            'pickup_id' => $pickup_filter,
+            'date_from' => $date_from,
+            'date_to'   => $date_to,
+            'search'    => $search,
+            'limit'     => $per_page,
+            'offset'    => ( $paged - 1 ) * $per_page,
+        );
+
+        $interventions       = LS_Database::get_interventions( $filter_args );
+        $total_interventions = LS_Database::count_interventions( $filter_args );
+        $pickups             = LS_Database::get_all_pickups();
+        $branches            = LS_Database::get_all_branches();
+        $statuses            = array(
+            'pending'   => __( 'En attente',   'loyal-system' ),
+            'confirmed' => __( 'Confirmé',     'loyal-system' ),
+            'en_route'  => __( 'En route',     'loyal-system' ),
+            'completed' => __( 'Complété',     'loyal-system' ),
+            'cancelled' => __( 'Annulé',       'loyal-system' ),
+        );
+        $types = array(
+            'livraison'   => __( 'Livraison',   'loyal-system' ),
+            'montage'     => __( 'Montage',     'loyal-system' ),
+            'maintenance' => __( 'Maintenance', 'loyal-system' ),
+        );
+
+        include LS_PLUGIN_DIR . 'admin/views/interventions.php';
+    }
+
     public static function render_categories_page() {
         if ( ! LS_Roles::current_user_can_access() ) {
             wp_die( esc_html__( 'Access denied.', 'loyal-system' ) );
@@ -222,6 +275,8 @@ class LS_Admin {
             'ls_feedback_delivery_page_id'    => __( 'Delivery Feedback Page',    'loyal-system' ),
             'ls_my_feedback_page_id'          => __( 'My Feedback Page',          'loyal-system' ),
             'ls_feedback_merchant_page_id'    => __( 'Merchant Feedback Page',    'loyal-system' ),
+            'ls_form_montage_page_id'         => __( 'Montage Form Page',         'loyal-system' ),
+            'ls_my_interventions_page_id'     => __( 'My Interventions Page',     'loyal-system' ),
         );
 
         include LS_PLUGIN_DIR . 'admin/views/settings.php';
@@ -249,6 +304,11 @@ class LS_Admin {
             'invoice_credit_pct'       => (float) ( $data['invoice_credit_pct']            ?? 0 ),
             'discount_rate'            => (float) ( $data['discount_rate']               ?? 0 ),
             'default_invoice_currency' => strtoupper( sanitize_key( $data['default_invoice_currency'] ?? 'GNF' ) ),
+            'ticket_sms_message'                => sanitize_textarea_field( $data['ticket_sms_message']                ?? '' ),
+            'feedback_maintenance_sms_message'  => sanitize_textarea_field( $data['feedback_maintenance_sms_message']  ?? '' ),
+            'feedback_delivery_sms_message'     => sanitize_textarea_field( $data['feedback_delivery_sms_message']     ?? '' ),
+            'feedback_montage_sms_message'      => sanitize_textarea_field( $data['feedback_montage_sms_message']      ?? '' ),
+            'feedback_merchant_sms_message'     => sanitize_textarea_field( $data['feedback_merchant_sms_message']     ?? '' ),
         ) );
 
         // Portal page IDs — stored as individual WP options.
@@ -263,6 +323,8 @@ class LS_Admin {
             'ls_feedback_delivery_page_id',
             'ls_my_feedback_page_id',
             'ls_feedback_merchant_page_id',
+            'ls_form_montage_page_id',
+            'ls_my_interventions_page_id',
         );
 
         foreach ( $portal_page_options as $option_name ) {

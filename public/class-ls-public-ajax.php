@@ -28,6 +28,7 @@ class LS_Public_Ajax {
             'ls_get_tickets',
             'ls_update_profile',
             'ls_get_my_interventions',
+            'ls_delete_ticket',
         );
 
         foreach ( $nopriv as $action ) {
@@ -303,6 +304,58 @@ class LS_Public_Ajax {
             'message'   => __( 'Ticket submitted successfully. We will get back to you soon.', 'loyal-system' ),
             'ticket_id' => $ticket_id,
         ) );
+    }
+
+    public static function handle_delete_ticket() {
+        self::verify_nonce();
+
+        if ( ! LS_Session::is_customer_logged_in() ) {
+            wp_send_json_error( array( 'message' => __( 'Not logged in.', 'loyal-system' ) ), 403 );
+        }
+
+        global $wpdb;
+        $p         = $wpdb->prefix . 'ls_';
+        $ticket_id = (int) ( $_POST['ticket_id'] ?? 0 );
+
+        if ( ! $ticket_id ) {
+            wp_send_json_error( array( 'message' => __( 'Invalid ticket.', 'loyal-system' ) ), 400 );
+        }
+
+        $ticket = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$p}tickets WHERE id = %d", $ticket_id ) );
+        if ( ! $ticket ) {
+            wp_send_json_error( array( 'message' => __( 'Ticket not found.', 'loyal-system' ) ), 404 );
+        }
+
+        // Ownership check — customer can only delete their own tickets.
+        $customer_id    = LS_Session::get_customer_id();
+        $customer_phone = LS_Session::get_customer_phone();
+        $owns_by_id     = ( (int) $ticket->customer_id === $customer_id );
+        $owns_by_phone  = ( (int) $ticket->customer_id === 0 && $customer_phone && $ticket->contact_phone === $customer_phone );
+
+        if ( ! $owns_by_id && ! $owns_by_phone ) {
+            wp_send_json_error( array( 'message' => __( 'Permission denied.', 'loyal-system' ) ), 403 );
+        }
+
+        // Delete associated images from disk.
+        $images = $wpdb->get_results( $wpdb->prepare(
+            "SELECT file_path FROM {$p}ticket_images WHERE ticket_id = %d",
+            $ticket_id
+        ) );
+        if ( $images ) {
+            $upload_dir = wp_upload_dir();
+            foreach ( $images as $img ) {
+                $file = $upload_dir['basedir'] . $img->file_path;
+                if ( file_exists( $file ) ) {
+                    @unlink( $file );
+                }
+            }
+        }
+
+        // Delete ticket images rows, then the ticket.
+        $wpdb->delete( "{$p}ticket_images", array( 'ticket_id' => $ticket_id ) );
+        $wpdb->delete( "{$p}tickets",       array( 'id'        => $ticket_id ) );
+
+        wp_send_json_success( array( 'message' => __( 'Ticket supprimé.', 'loyal-system' ) ) );
     }
 
     // ── Feedback ──────────────────────────────────────────────────────────────

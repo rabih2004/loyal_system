@@ -38,11 +38,43 @@
                     ? add_query_arg( 'ticket_id', $t->id, get_permalink( $ticket_view_page ) )
                     : add_query_arg( 'ticket_id', $t->id );
                 ?>
-                <a href="<?php echo esc_url( $view_url ); ?>" class="ls-btn ls-btn-sm ls-btn-outline">
-                    <?php esc_html_e( 'Voir les détails', 'loyal-system' ); ?>
-                </a>
+                <div class="ls-ticket-actions">
+                    <a href="<?php echo esc_url( $view_url ); ?>" class="ls-btn ls-btn-sm ls-btn-outline">
+                        <?php esc_html_e( 'Voir les détails', 'loyal-system' ); ?>
+                    </a>
+                    <button type="button"
+                        class="ls-btn ls-btn-sm ls-btn-danger ls-delete-ticket-btn"
+                        data-id="<?php echo (int) $t->id; ?>"
+                        data-nonce="<?php echo esc_attr( wp_create_nonce( 'ls_public_nonce' ) ); ?>">
+                        <?php esc_html_e( 'Supprimer', 'loyal-system' ); ?>
+                    </button>
+                </div>
             </div>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
 </div>
+
+<script>
+(function($){
+    $(document).on('click', '.ls-delete-ticket-btn', function(){
+        if ( ! confirm('<?php echo esc_js( __( 'Supprimer ce ticket définitivement ?', 'loyal-system' ) ); ?>') ) return;
+        var $btn  = $(this).prop('disabled', true);
+        var $card = $btn.closest('.ls-ticket-item');
+        $.post('<?php echo esc_js( admin_url('admin-ajax.php') ); ?>', {
+            action:    'ls_delete_ticket',
+            nonce:     $btn.data('nonce'),
+            ticket_id: $btn.data('id')
+        })
+        .done(function(resp){
+            if ( resp.success ) {
+                $card.fadeOut(300, function(){ $(this).remove(); });
+            } else {
+                alert(resp.data && resp.data.message ? resp.data.message : '<?php echo esc_js( __( 'Une erreur est survenue.', 'loyal-system' ) ); ?>');
+                $btn.prop('disabled', false);
+            }
+        })
+        .fail(function(){ alert('<?php echo esc_js( __( 'Une erreur est survenue.', 'loyal-system' ) ); ?>'); $btn.prop('disabled', false); });
+    });
+})(jQuery);
+</script>

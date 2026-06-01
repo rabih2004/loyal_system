@@ -10,6 +10,8 @@
     </button>
     <hr class="wp-header-end">
 
+    <div id="ls-invoice-msg" style="display:none;margin-top:8px;" class="notice"></div>
+
     <!-- ── Add Invoice Form ────────────────────────────────────────────── -->
     <div id="ls-add-invoice-wrap" style="display:none;">
         <div class="ls-card postbox">
@@ -213,6 +215,14 @@
                            title="<?php esc_attr_e( 'View attached file', 'loyal-system' ); ?>">
                             <span class="dashicons dashicons-media-default" style="line-height:26px;font-size:14px;"></span>
                         </a>
+                    <?php endif; ?>
+                    <?php if ( current_user_can( 'manage_options' ) ) : ?>
+                    <button type="button" class="button button-small button-link-delete ls-delete-invoice-btn"
+                        data-id="<?php echo (int) $inv->id; ?>"
+                        style="margin-left:4px;"
+                        title="<?php esc_attr_e( 'Delete invoice and reverse balance', 'loyal-system' ); ?>">
+                        <?php esc_html_e( 'Supprimer', 'loyal-system' ); ?>
+                    </button>
                     <?php endif; ?>
                 </td>
             </tr>
@@ -484,6 +494,23 @@
         })
         .fail(function() { $('#ls-otp-error').text(lsAdmin.i18n.error).show(); })
         .always(function() { $btn.prop('disabled', false); $spinner.removeClass('is-active'); });
+    });
+    // Delete invoice
+    $(document).on('click', '.ls-delete-invoice-btn', function(){
+        var id  = $(this).data('id');
+        var $row = $('#ls-invoice-table tr[data-id="' + id + '"], #ls-edit-row-' + id);
+        if ( ! confirm('<?php echo esc_js( __( 'Supprimer cette facture ? Les crédits gagnés seront retirés du solde client, et les crédits utilisés seront remboursés.', 'loyal-system' ) ); ?>') ) return;
+        $.post(lsAdmin.ajaxUrl, { action: 'ls_admin_delete_invoice', nonce: lsAdmin.nonce, invoice_id: id })
+        .done(function(resp){
+            if (resp.success) {
+                $row.fadeOut(300, function(){ $(this).remove(); });
+                $('#ls-invoice-msg').attr('class','notice notice-success').text(resp.data.message).show();
+            } else {
+                var msg = resp.data && resp.data.message ? resp.data.message : lsAdmin.i18n.error;
+                alert(msg);
+            }
+        })
+        .fail(function(){ alert(lsAdmin.i18n.error); });
     });
 })(jQuery);
 </script>

@@ -247,7 +247,17 @@ class LS_Shortcodes {
 
         ob_start();
         include $file;
-        return ob_get_clean();
+        $html = ob_get_clean();
+
+        $phone   = '+224613727777';
+        $html   .= '<div class="ls-portal-footer">'
+                 . '<span class="ls-portal-footer-icon">&#128222;</span>'
+                 . '<span>' . esc_html__( 'Pour plus d\'informations, veuillez appeler ce numéro', 'loyal-system' ) . ' '
+                 . '<a href="tel:' . esc_attr( $phone ) . '" class="ls-portal-footer-phone">' . esc_html( $phone ) . '</a>'
+                 . '</span>'
+                 . '</div>';
+
+        return $html;
     }
 
     /**

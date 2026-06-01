@@ -48,55 +48,75 @@ $logout_url = wp_nonce_url(
     <div class="ls-card ls-dash-menu-card">
         <h3 class="ls-section-title"><?php esc_html_e('Menu', 'loyal-system'); ?></h3>
 
+        <?php
+        $img_base = LS_PLUGIN_URL . 'public/assets/images/menu/';
+        ?>
+
         <!-- Group 1: personal -->
         <p class="ls-dash-menu-group-label"><?php esc_html_e('Mes activités', 'loyal-system'); ?></p>
         <nav class="ls-dash-btn-row" aria-label="<?php esc_attr_e('Mes activités', 'loyal-system'); ?>">
             <a href="<?php echo esc_url($my_tickets_url); ?>" class="ls-dash-btn">
-                <span class="ls-dash-btn-icon">&#127916;</span>
-                <span class="ls-dash-btn-label"><?php esc_html_e('Mes tickets', 'loyal-system'); ?><br>(Maintenance)</span>
+                <span class="ls-dash-btn-thumb-wrap">
+                    <img src="<?php echo esc_url($img_base . 'mes-tickets.jpg'); ?>" alt="<?php esc_attr_e('Mes tickets', 'loyal-system'); ?>" loading="lazy">
+                </span>
+                <span class="ls-dash-btn-label"><?php esc_html_e('Mes tickets', 'loyal-system'); ?><small>(Maintenance)</small></span>
             </a>
             <?php if ($my_feedback_url) : ?>
                 <a href="<?php echo esc_url($my_feedback_url); ?>" class="ls-dash-btn">
-                    <span class="ls-dash-btn-icon">&#11088;</span>
+                    <span class="ls-dash-btn-thumb-wrap">
+                        <img src="<?php echo esc_url($img_base . 'mes-avis.jpg'); ?>" alt="<?php esc_attr_e('Mes avis', 'loyal-system'); ?>" loading="lazy">
+                    </span>
                     <span class="ls-dash-btn-label"><?php esc_html_e('Mes avis', 'loyal-system'); ?></span>
                 </a>
             <?php endif; ?>
             <?php if ($my_interventions_url) : ?>
                 <a href="<?php echo esc_url($my_interventions_url); ?>" class="ls-dash-btn">
-                    <span class="ls-dash-btn-icon">&#128666;</span>
+                    <span class="ls-dash-btn-thumb-wrap">
+                        <img src="<?php echo esc_url($img_base . 'mes-interventions.jpg'); ?>" alt="<?php esc_attr_e('Mes interventions', 'loyal-system'); ?>" loading="lazy">
+                    </span>
                     <span class="ls-dash-btn-label"><?php esc_html_e('Mes interventions', 'loyal-system'); ?></span>
                 </a>
             <?php endif; ?>
+            <a href="<?php echo esc_url($submit_url); ?>" class="ls-dash-btn">
+                <span class="ls-dash-btn-thumb-wrap">
+                    <img src="<?php echo esc_url($img_base . 'nouveau-ticket.jpg'); ?>" alt="<?php esc_attr_e('Nouveau ticket', 'loyal-system'); ?>" loading="lazy">
+                </span>
+                <span class="ls-dash-btn-label"><?php esc_html_e('Nouveau ticket', 'loyal-system'); ?><small>(Maintenance)</small></span>
+            </a>
         </nav>
 
-        <!-- Group 2: actions -->
-        <p class="ls-dash-menu-group-label ls-dash-menu-group-label--mt"><?php esc_html_e('Déposer une demande', 'loyal-system'); ?></p>
-        <nav class="ls-dash-btn-row" aria-label="<?php esc_attr_e('Déposer une demande', 'loyal-system'); ?>">
-            <a href="<?php echo esc_url($submit_url); ?>" class="ls-dash-btn">
-                <span class="ls-dash-btn-icon">&#128196;</span>
-                <span class="ls-dash-btn-label"><?php esc_html_e('Nouveau ticket', 'loyal-system'); ?> <br>(Maintenance)</span>
-            </a>
+        <!-- Group 2: feedback -->
+        <p class="ls-dash-menu-group-label ls-dash-menu-group-label--mt"><?php esc_html_e('Donner votre avis', 'loyal-system'); ?></p>
+        <nav class="ls-dash-btn-row" aria-label="<?php esc_attr_e('Donner votre avis', 'loyal-system'); ?>">
             <?php if ($feedback_maintenance_url) : ?>
                 <a href="<?php echo esc_url($feedback_maintenance_url); ?>" class="ls-dash-btn">
-                    <span class="ls-dash-btn-icon">&#128295;</span>
+                    <span class="ls-dash-btn-thumb-wrap">
+                        <img src="<?php echo esc_url($img_base . 'feedback-maintenance.jpg'); ?>" alt="<?php esc_attr_e('Feedback Maintenance', 'loyal-system'); ?>" loading="lazy">
+                    </span>
                     <span class="ls-dash-btn-label"><?php esc_html_e('Feedback Maintenance', 'loyal-system'); ?></span>
                 </a>
             <?php endif; ?>
             <?php if ($form_montage_url) : ?>
                 <a href="<?php echo esc_url($form_montage_url); ?>" class="ls-dash-btn">
-                    <span class="ls-dash-btn-icon">&#128297;</span>
+                    <span class="ls-dash-btn-thumb-wrap">
+                        <img src="<?php echo esc_url($img_base . 'feedback-montage.jpg'); ?>" alt="<?php esc_attr_e('Feedback Montage', 'loyal-system'); ?>" loading="lazy">
+                    </span>
                     <span class="ls-dash-btn-label"><?php esc_html_e('Feedback Montage', 'loyal-system'); ?></span>
                 </a>
             <?php endif; ?>
             <?php if ($feedback_delivery_url) : ?>
                 <a href="<?php echo esc_url($feedback_delivery_url); ?>" class="ls-dash-btn">
-                    <span class="ls-dash-btn-icon">&#128666;</span>
+                    <span class="ls-dash-btn-thumb-wrap">
+                        <img src="<?php echo esc_url($img_base . 'feedback-livraison.jpg'); ?>" alt="<?php esc_attr_e('Feedback Livraison', 'loyal-system'); ?>" loading="lazy">
+                    </span>
                     <span class="ls-dash-btn-label"><?php esc_html_e('Feedback Livraison', 'loyal-system'); ?></span>
                 </a>
             <?php endif; ?>
             <?php if ($feedback_merchant_url) : ?>
                 <a href="<?php echo esc_url($feedback_merchant_url); ?>" class="ls-dash-btn">
-                    <span class="ls-dash-btn-icon">&#127978;</span>
+                    <span class="ls-dash-btn-thumb-wrap">
+                        <img src="<?php echo esc_url($img_base . 'feedback-magasin.jpg'); ?>" alt="<?php esc_attr_e('Feedback Magasin', 'loyal-system'); ?>" loading="lazy">
+                    </span>
                     <span class="ls-dash-btn-label"><?php esc_html_e('Feedback Magasin', 'loyal-system'); ?></span>
                 </a>
             <?php endif; ?>

@@ -15,6 +15,7 @@ class LS_Admin_Ajax {
             'ls_admin_generate_otp_for_phone',
             'ls_admin_add_invoice',
             'ls_admin_update_invoice',
+            'ls_admin_delete_invoice',
             'ls_admin_lookup_phone',
             'ls_admin_search_customer',
             'ls_admin_get_balance',
@@ -269,6 +270,67 @@ class LS_Admin_Ajax {
         }
 
         wp_send_json_success( array( 'message' => __( 'Invoice updated.', 'loyal-system' ) ) );
+    }
+
+    public static function handle_delete_invoice() {
+        self::verify( 'manage_options' ); // admins only
+
+        global $wpdb;
+        $p          = $wpdb->prefix . 'ls_';
+        $invoice_id = (int) ( $_POST['invoice_id'] ?? 0 );
+
+        if ( ! $invoice_id ) {
+            wp_send_json_error( array( 'message' => __( 'Invalid invoice.', 'loyal-system' ) ), 400 );
+        }
+
+        $invoice = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$p}invoices WHERE id = %d", $invoice_id ) );
+        if ( ! $invoice ) {
+            wp_send_json_error( array( 'message' => __( 'Invoice not found.', 'loyal-system' ) ), 404 );
+        }
+
+        $customer_id = (int) $invoice->customer_id;
+
+        // Fetch all ledger entries linked to this invoice.
+        $entries = $wpdb->get_results( $wpdb->prepare(
+            "SELECT * FROM {$p}ledger WHERE invoice_id = %d",
+            $invoice_id
+        ) );
+
+        foreach ( $entries as $entry ) {
+            if ( $entry->type === 'credit' ) {
+                // The customer earned credits from this invoice — reverse with a debit.
+                LS_Database::add_ledger_entry(
+                    $customer_id,
+                    $invoice_id,
+                    (float) $entry->amount,
+                    'debit',
+                    sprintf( __( 'Reversal: credit from deleted invoice #%d', 'loyal-system' ), $invoice_id )
+                );
+            } elseif ( $entry->type === 'debit' ) {
+                // Credits were redeemed on this invoice — return them with a credit.
+                LS_Database::add_ledger_entry(
+                    $customer_id,
+                    $invoice_id,
+                    (float) $entry->amount,
+                    'credit',
+                    sprintf( __( 'Refund: credits used on deleted invoice #%d', 'loyal-system' ), $invoice_id )
+                );
+            }
+        }
+
+        // Delete physical file if present.
+        if ( ! empty( $invoice->file_path ) ) {
+            $upload_dir = wp_upload_dir();
+            $file       = $upload_dir['basedir'] . $invoice->file_path;
+            if ( file_exists( $file ) ) {
+                @unlink( $file );
+            }
+        }
+
+        // Delete the invoice record (ledger entries kept as audit trail via reversals).
+        $wpdb->delete( "{$p}invoices", array( 'id' => $invoice_id ) );
+
+        wp_send_json_success( array( 'message' => __( 'Invoice deleted and balance adjusted.', 'loyal-system' ) ) );
     }
 
     // ── Customers ─────────────────────────────────────────────────────────────
